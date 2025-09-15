@@ -70,16 +70,25 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo:
-            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard/${userType}`,
+          emailRedirectTo: `${window.location.origin}/dashboard/${userType}`,
           data: metadata,
         },
       })
 
-      if (error) throw error
+      if (error) {
+        console.error("Supabase signup error:", error)
+        throw error
+      }
       router.push("/auth/signup-success")
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred")
+    } catch (error: any) {
+      console.error("Signup error:", error)
+      if (error?.message?.includes("User already registered")) {
+        setError("An account with this email already exists. Please sign in instead.")
+      } else if (error?.message?.includes("Password should be")) {
+        setError("Password should be at least 6 characters long.")
+      } else {
+        setError(error?.message || "An error occurred during signup. Please try again.")
+      }
     } finally {
       setIsLoading(false)
     }
