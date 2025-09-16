@@ -45,7 +45,7 @@ export function Navigation() {
   const navItems = [
     { href: "/", label: "Home", icon: Mountain },
     { href: "/monasteries", label: "Monasteries", icon: Mountain },
-    { href: "/map", label: "Interactive Map", icon: Map },
+    { href: "/maps", label: "Interactive Map", icon: Map },
     { href: "/events", label: "Events & Festivals", icon: Calendar },
     { href: "/tours", label: "Virtual Tours", icon: Archive },
     { href: "/plan", label: "Plan Your Visit", icon: Compass },

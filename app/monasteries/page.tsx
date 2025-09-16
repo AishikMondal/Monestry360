@@ -1,258 +1,311 @@
 "use client"
 
-import { useState } from "react"
+import React, { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { createClient } from '@/lib/supabase/client'
 import { Navigation } from "@/components/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MapPin, Clock, Users, Search, Filter } from "lucide-react"
-import Link from "next/link"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import Link from 'next/link'
 
-// Mock data for monasteries
-const monasteries = [
-  {
-    id: 1,
-    name: "Rumtek Monastery",
-    location: "East Sikkim",
-    district: "east",
-    description: "The largest monastery in Sikkim, known as the Dharma Chakra Centre.",
-    image: "/rumtek-monastery-golden-roof-with-mountains.jpg",
-    established: "1966",
-    visitors: "50,000+ annually",
-    highlights: ["Golden Stupa", "Tibetan Art", "Prayer Wheels"],
-    altitude: "1,550m",
-    accessibility: "Easy",
-  },
-  {
-    id: 2,
-    name: "Pemayangtse Monastery",
-    location: "West Sikkim",
-    district: "west",
-    description: "One of the oldest monasteries in Sikkim with stunning mountain views.",
-    image: "/pemayangtse-monastery-white-walls-mountain-backdro.jpg",
-    established: "1705",
-    visitors: "30,000+ annually",
-    highlights: ["Ancient Murals", "Wooden Sculptures", "Kanchenjunga Views"],
-    altitude: "2,085m",
-    accessibility: "Moderate",
-  },
-  {
-    id: 3,
-    name: "Enchey Monastery",
-    location: "East Sikkim",
-    district: "east",
-    description: "A 200-year-old monastery famous for its annual Cham dance.",
-    image: "/enchey-monastery-colorful-prayer-flags-traditional.jpg",
-    established: "1840",
-    visitors: "25,000+ annually",
-    highlights: ["Cham Dance", "Prayer Flags", "City Views"],
-    altitude: "1,875m",
-    accessibility: "Easy",
-  },
-  {
-    id: 4,
-    name: "Tashiding Monastery",
-    location: "West Sikkim",
-    district: "west",
-    description: "Sacred monastery on a hilltop with panoramic valley views.",
-    image: "/placeholder.svg?key=tashiding",
-    established: "1717",
-    visitors: "20,000+ annually",
-    highlights: ["Sacred Chorten", "Valley Views", "Holy Water"],
-    altitude: "1,465m",
-    accessibility: "Moderate",
-  },
-  {
-    id: 5,
-    name: "Phensang Monastery",
-    location: "North Sikkim",
-    district: "north",
-    description: "Remote monastery offering tranquil meditation experiences.",
-    image: "/placeholder.svg?key=phensang",
-    established: "1721",
-    visitors: "15,000+ annually",
-    highlights: ["Meditation Halls", "Mountain Views", "Ancient Texts"],
-    altitude: "2,500m",
-    accessibility: "Difficult",
-  },
-  {
-    id: 6,
-    name: "Ralang Monastery",
-    location: "South Sikkim",
-    district: "south",
-    description: "Beautiful monastery known for its architectural splendor.",
-    image: "/placeholder.svg?key=ralang",
-    established: "1768",
-    visitors: "18,000+ annually",
-    highlights: ["Architecture", "Festivals", "Art Collection"],
-    altitude: "1,200m",
-    accessibility: "Easy",
-  },
-]
+interface Monastery {
+  id: string
+  monastery_name: string
+  district: string
+  address: string
+  latitude: number
+  longitude: number
+  description?: string
+  founded_year?: number
+  monastery_type?: string
+  visiting_hours?: string
+  entry_fee?: number
+  contact_phone?: string
+  website?: string
+  image_url?: string
+}
 
 export default function MonasteriesPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedDistrict, setSelectedDistrict] = useState("all")
-  const [selectedAccessibility, setSelectedAccessibility] = useState("all")
+  const [monasteries, setMonasteries] = useState<Monastery[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('All')
 
-  const filteredMonasteries = monasteries.filter((monastery) => {
-    const matchesSearch =
-      monastery.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      monastery.location.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesDistrict = selectedDistrict === "all" || monastery.district === selectedDistrict
-    const matchesAccessibility =
-      selectedAccessibility === "all" || monastery.accessibility.toLowerCase() === selectedAccessibility.toLowerCase()
+  useEffect(() => {
+    fetchMonasteries()
+  }, [])
 
-    return matchesSearch && matchesDistrict && matchesAccessibility
-  })
+  const fetchMonasteries = async () => {
+    try {
+      const supabase = createClient()
+      
+      const { data, error } = await supabase
+        .from('monasteries')
+        .select('*')
+        .order('monastery_name')
+
+      if (error) throw error
+
+      if (data && data.length > 0) {
+        setMonasteries(data)
+      } else {
+        // Fallback sample data with images and details
+        setMonasteries([
+          {
+            id: '1',
+            monastery_name: 'Rumtek Monastery',
+            district: 'East Sikkim',
+            address: 'Rumtek, East Sikkim 737135',
+            latitude: 27.3153,
+            longitude: 88.5502,
+            description: 'Rumtek Monastery is one of the most significant monasteries in Sikkim. It is the seat of the Karmapa, head of the Karma Kagyu lineage. The monastery was built in the 1960s and houses many precious Buddhist artifacts.',
+            founded_year: 1966,
+            monastery_type: 'Karma Kagyu',
+            visiting_hours: '6:00 AM - 6:00 PM',
+            entry_fee: 0,
+            contact_phone: '+91-3592-252523',
+            image_url: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=500&h=300&fit=crop'
+          },
+          {
+            id: '2',
+            monastery_name: 'Enchey Monastery',
+            district: 'East Sikkim',
+            address: 'Gangtok, Sikkim 737101',
+            latitude: 27.3389,
+            longitude: 88.6065,
+            description: 'Enchey Monastery is a 200-year-old Buddhist monastery located in Gangtok. The monastery belongs to the Nyingma order of Vajrayana Buddhism.',
+            founded_year: 1840,
+            monastery_type: 'Nyingma',
+            visiting_hours: '5:00 AM - 7:00 PM',
+            entry_fee: 0,
+            contact_phone: '+91-3592-202596',
+            image_url: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=500&h=300&fit=crop'
+          },
+          {
+            id: '3',
+            monastery_name: 'Pemayangtse Monastery',
+            district: 'West Sikkim',
+            address: 'Pelling, West Sikkim 737113',
+            latitude: 27.2151,
+            longitude: 88.2468,
+            description: 'Pemayangtse Monastery is one of the oldest and premier monasteries of Sikkim. Built in 1705, it is the head monastery of the Nyingma order.',
+            founded_year: 1705,
+            monastery_type: 'Nyingma',
+            visiting_hours: '7:00 AM - 5:00 PM',
+            entry_fee: 10,
+            contact_phone: '+91-3595-250658',
+            image_url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=500&h=300&fit=crop'
+          },
+          {
+            id: '4',
+            monastery_name: 'Tashiding Monastery',
+            district: 'West Sikkim',
+            address: 'Tashiding, West Sikkim',
+            latitude: 27.3404,
+            longitude: 88.2717,
+            description: 'Tashiding Monastery is regarded as the holiest of all monasteries in Sikkim. Located on a hilltop, it offers breathtaking views of the surrounding mountains.',
+            founded_year: 1641,
+            monastery_type: 'Nyingma',
+            visiting_hours: '6:00 AM - 6:00 PM',
+            entry_fee: 0,
+            image_url: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=300&fit=crop'
+          },
+          {
+            id: '5',
+            monastery_name: 'Phodong Monastery',
+            district: 'North Sikkim',
+            address: 'Phodong, North Sikkim',
+            latitude: 27.4711,
+            longitude: 88.5747,
+            description: 'Phodong Monastery is one of the six most important monasteries of Sikkim. It was reconstructed in 1977 and houses many ancient Buddhist scriptures.',
+            founded_year: 1740,
+            monastery_type: 'Kagyu',
+            visiting_hours: '6:00 AM - 5:00 PM',
+            entry_fee: 0,
+            image_url: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=500&h=300&fit=crop'
+          },
+          {
+            id: '6',
+            monastery_name: 'Labrang Monastery',
+            district: 'North Sikkim',
+            address: 'Lachen, North Sikkim',
+            latitude: 27.5000,
+            longitude: 88.5500,
+            description: 'Labrang Monastery is located in the beautiful valley of Lachen. It is known for its peaceful environment and traditional Buddhist architecture.',
+            founded_year: 1806,
+            monastery_type: 'Nyingma',
+            visiting_hours: '7:00 AM - 4:00 PM',
+            entry_fee: 0,
+            image_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=300&fit=crop'
+          },
+          {
+            id: '7',
+            monastery_name: 'Ralang Monastery',
+            district: 'South Sikkim',
+            address: 'Ralang, South Sikkim',
+            latitude: 27.1500,
+            longitude: 88.5000,
+            description: 'Ralang Monastery is known for its annual Kagyed dance festival. The monastery houses beautiful murals and ancient Buddhist texts.',
+            founded_year: 1768,
+            monastery_type: 'Kagyu',
+            visiting_hours: '6:00 AM - 6:00 PM',
+            entry_fee: 5,
+            image_url: 'https://images.unsplash.com/photo-1591123720511-7637d5d3ffe4?w=500&h=300&fit=crop'
+          },
+          {
+            id: '8',
+            monastery_name: 'Do Drul Chorten',
+            district: 'East Sikkim',
+            address: 'Gangtok, East Sikkim',
+            latitude: 27.3270,
+            longitude: 88.6051,
+            description: 'Do Drul Chorten is one of the most important stupas in Sikkim. Built in 1945, it contains complete Dorjee Phurba, Kangyur relics and other sacred objects.',
+            founded_year: 1945,
+            monastery_type: 'Nyingma',
+            visiting_hours: '5:00 AM - 8:00 PM',
+            entry_fee: 0,
+            image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=300&fit=crop'
+          }
+        ])
+      }
+    } catch (error) {
+      console.error('Error fetching monasteries:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const districts = ['All', 'East Sikkim', 'West Sikkim', 'North Sikkim', 'South Sikkim']
+  
+  const filteredMonasteries = selectedDistrict === 'All' 
+    ? monasteries 
+    : monasteries.filter(m => m.district === selectedDistrict)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading monasteries...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-6">
       <Navigation />
-
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Sacred Monasteries of Sikkim</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-pretty">
-            Discover over 200 monasteries across four districts of Sikkim. Each monastery tells a unique story of
-            spiritual devotion, architectural beauty, and cultural heritage.
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-green-800 mb-4">
+            Explore Sikkim's Sacred Monasteries
+          </h1>
+          <p className="text-lg text-green-600 mb-6">
+            Discover the spiritual heritage and rich Buddhist culture of Sikkim
           </p>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-card rounded-lg p-6 mb-8 shadow-sm">
-          <div className="flex flex-col lg:flex-row gap-4 items-center">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search monasteries by name or location..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <div className="flex gap-4 items-center">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Filters:</span>
-              </div>
-
-              <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="District" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Districts</SelectItem>
-                  <SelectItem value="east">East Sikkim</SelectItem>
-                  <SelectItem value="west">West Sikkim</SelectItem>
-                  <SelectItem value="north">North Sikkim</SelectItem>
-                  <SelectItem value="south">South Sikkim</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedAccessibility} onValueChange={setSelectedAccessibility}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Accessibility" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Levels</SelectItem>
-                  <SelectItem value="easy">Easy</SelectItem>
-                  <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="difficult">Difficult</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          
+          {/* District Filter */}
+          <div className="flex justify-center gap-2 flex-wrap">
+            {districts.map(district => (
+              <button
+                key={district}
+                onClick={() => setSelectedDistrict(district)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedDistrict === district
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white text-green-600 hover:bg-green-100'
+                }`}
+              >
+                {district} {district !== 'All' && `(${monasteries.filter(m => m.district === district).length})`}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Results count */}
-        <div className="mb-6">
-          <p className="text-muted-foreground">
-            Showing {filteredMonasteries.length} of {monasteries.length} monasteries
-          </p>
-        </div>
-
-        {/* Monastery Grid */}
+        {/* Monasteries Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredMonasteries.map((monastery) => (
-            <Card
-              key={monastery.id}
-              className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="relative">
+          {filteredMonasteries.map((monastery, index) => (
+            <Card key={monastery.id} className="monastery-card card-hover-effect overflow-hidden shadow-xl border-0 bg-white">
+              {/* Image */}
+              <div className="relative h-48 bg-gray-200">
                 <img
-                  src={monastery.image || "/placeholder.svg"}
-                  alt={monastery.name}
-                  className="w-full h-48 object-cover"
+                  src={monastery.image_url || `https://images.unsplash.com/photo-${1544735716392 + index}fe2489ffa?w=600&h=400&fit=crop`}
+                  alt={monastery.monastery_name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const fallbackImages = [
+                      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&h=400&fit=crop',
+                      'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&h=400&fit=crop',
+                      'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&h=400&fit=crop',
+                      'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=600&h=400&fit=crop',
+                      'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&h=400&fit=crop',
+                      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
+                      'https://images.unsplash.com/photo-1591123720511-7637d5d3ffe4?w=600&h=400&fit=crop',
+                      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop'
+                    ]
+                    e.currentTarget.src = fallbackImages[index % fallbackImages.length]
+                  }}
                 />
-                <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
-                  {monastery.district.charAt(0).toUpperCase() + monastery.district.slice(1)} Sikkim
-                </Badge>
-                <Badge
-                  className="absolute top-4 right-4"
-                  variant={
-                    monastery.accessibility === "Easy"
-                      ? "secondary"
-                      : monastery.accessibility === "Moderate"
-                        ? "default"
-                        : "destructive"
-                  }
-                >
-                  {monastery.accessibility}
-                </Badge>
+                <div className="absolute top-3 right-3">
+                  <Badge variant="secondary" className="bg-white text-green-800 font-semibold">
+                    {monastery.district}
+                  </Badge>
+                </div>
               </div>
 
-              <CardHeader>
-                <CardTitle className="text-xl">{monastery.name}</CardTitle>
-                <CardDescription className="flex items-center text-muted-foreground">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {monastery.location} • {monastery.altitude}
-                </CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl text-green-800 font-bold mb-2">
+                  {monastery.monastery_name}
+                </CardTitle>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span>📍</span>
+                  <span>{monastery.address}</span>
+                </div>
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground text-pretty">{monastery.description}</p>
+                <p className="text-gray-600 text-sm">
+                  {monastery.description?.slice(0, 100) || 'A sacred Buddhist monastery in Sikkim.'}...
+                </p>
 
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    Est. {monastery.established}
-                  </div>
-                  <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-1" />
-                    {monastery.visitors}
-                  </div>
+                {/* Basic Info */}
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <span>Founded: {monastery.founded_year || 'Ancient'}</span>
+                  <span>{monastery.entry_fee === 0 ? 'Free Entry' : `₹${monastery.entry_fee}`}</span>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {monastery.highlights.map((highlight) => (
-                    <Badge key={highlight} variant="outline" className="text-xs">
-                      {highlight}
-                    </Badge>
-                  ))}
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Link 
+                    href={`/monastery/${monastery.id}`}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    Learn More
+                  </Link>
+                  <Link 
+                    href={`/maps?monastery=${monastery.id}`}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    View on Map
+                  </Link>
                 </div>
-
-                <Button asChild className="w-full">
-                  <Link href={`/monasteries/${monastery.id}`}>Explore Details</Link>
-                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {/* No results */}
-        {filteredMonasteries.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">
-              No monasteries found matching your criteria. Try adjusting your filters.
-            </p>
-          </div>
-        )}
-      </main>
+        {/* Footer */}
+        <div className="text-center mt-12">
+          <Link 
+            href="/maps"
+            className="inline-block bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            🗺️ View All on Interactive Map
+          </Link>
+        </div>
+
+
+      </div>
     </div>
   )
 }

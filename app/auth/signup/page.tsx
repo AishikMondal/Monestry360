@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-
+import React from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -275,6 +274,15 @@ export default function SignupPage() {
               Already have an account?{" "}
               <Link href="/auth/login" className="font-medium text-green-700 hover:text-green-800 underline">
                 Sign in
+              </Link>
+            </div>
+
+            <div className="mt-4 text-center">
+              <Link 
+                href="/simple-working-map" 
+                className="text-sm font-medium text-blue-600 hover:text-blue-800 underline"
+              >
+                🗺️ View Test Map
               </Link>
             </div>
           </CardContent>

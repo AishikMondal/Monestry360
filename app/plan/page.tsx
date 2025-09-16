@@ -1,512 +1,670 @@
 "use client"
 
-import { useState } from "react"
-import { Navigation } from "@/components/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Checkbox } from "@/components/ui/checkbox"
-import { MapPin, Clock, Users, Route, Hotel, Car, Plane, Train, Mountain, Star, Download, Share2 } from "lucide-react"
+import React, { useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import Link from 'next/link'
 
-// Mock data for travel planning
-const monasteries = [
-  { id: 1, name: "Rumtek Monastery", location: "East Sikkim", duration: "3-4 hours", difficulty: "Easy" },
-  { id: 2, name: "Pemayangtse Monastery", location: "West Sikkim", duration: "2-3 hours", difficulty: "Moderate" },
-  { id: 3, name: "Enchey Monastery", location: "East Sikkim", duration: "1-2 hours", difficulty: "Easy" },
-  { id: 4, name: "Tashiding Monastery", location: "West Sikkim", duration: "2-3 hours", difficulty: "Moderate" },
-]
+export default function PlanYourVisitPage() {
+  const [formData, setFormData] = useState({
+    startLocation: '',
+    duration: '',
+    budget: '',
+    interests: [] as string[],
+    travelMonth: '',
+    groupSize: 1,
+    physicalFitness: '',
+    transport: ''
+  })
+  
+  const [generatedGuide, setGeneratedGuide] = useState<any>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
-const accommodations = [
-  { id: 1, name: "Hotel Tibet", location: "Gangtok", price: "₹3,500/night", rating: 4.2, type: "Hotel" },
-  { id: 2, name: "Monastery Guest House", location: "Rumtek", price: "₹1,200/night", rating: 4.0, type: "Guest House" },
-  { id: 3, name: "Mountain View Resort", location: "Pelling", price: "₹4,200/night", rating: 4.5, type: "Resort" },
-  { id: 4, name: "Budget Inn", location: "Gangtok", price: "₹800/night", rating: 3.8, type: "Budget" },
-]
+  const generateGuide = async () => {
+    setIsGenerating(true)
+    await new Promise(resolve => setTimeout(resolve, 2500))
+    
+    const duration = parseInt(formData.duration)
+    const isBudget = formData.budget === 'budget'
+    const isWinter = ['December', 'January', 'February'].includes(formData.travelMonth)
+    
+    const guide = {
+      title: `${duration}-Day Sikkim Monastery Journey`,
+      summary: `Complete ${formData.budget} travel guide for ${duration} days exploring Sikkim's sacred monasteries with ${formData.groupSize} traveler${formData.groupSize > 1 ? 's' : ''}.`,
+      totalBudget: isBudget ? duration * 3500 : duration * 8500,
+      itinerary: generateItinerary(duration, isBudget, isWinter),
+      essentials: [
+        '📄 Valid ID proof (mandatory everywhere)',
+        '🧥 Warm layered clothing (temperature varies)',
+        '👟 Comfortable walking/trekking shoes',
+        '💊 Altitude sickness medication',
+        '💰 Cash ₹500+ daily (limited ATMs)',
+        '📱 Power bank & phone chargers',
+        '🎒 Light daypack for monastery visits',
+        '💧 Water bottle (stay hydrated)',
+        '📷 Camera (check monastery photography rules)',
+        '🧣 Winter accessories for cold weather'
+      ],
+      tips: [
+        '🙏 Always dress modestly in monasteries',
+        '📸 Ask permission before photographing people',
+        '⏰ Confirm monastery opening hours in advance',
+        '🌨️ Mountain weather changes rapidly - be prepared',
+        '💸 Limited ATM availability outside Gangtok',
+        '📱 Poor internet connectivity in remote areas',
+        '🚗 Book transport one day in advance',
+        '🏥 Carry basic first-aid and medications'
+      ],
+      contacts: [
+        '🚑 Emergency Services: 102',
+        '👮 Police Helpline: 100',
+        '🏥 STNM Hospital, Gangtok: +91-3592-202016',
+        '📞 Tourism Helpline: 1363',
+        '🚁 Helicopter Services: +91-3592-280311'
+      ]
+    }
+    
+    setGeneratedGuide(guide)
+    setIsGenerating(false)
+  }
 
-const transportOptions = [
-  { id: 1, type: "Flight", from: "Delhi", to: "Bagdogra", duration: "2h 30m", price: "₹8,500" },
-  { id: 2, type: "Train", from: "Delhi", to: "New Jalpaiguri", duration: "18h", price: "₹2,200" },
-  { id: 3, type: "Car Rental", location: "Gangtok", duration: "Per day", price: "₹2,500" },
-  { id: 4, type: "Taxi", from: "Bagdogra", to: "Gangtok", duration: "4h", price: "₹3,000" },
-]
+  const generateItinerary = (days: number, budget: boolean, winter: boolean) => {
+    const plans = []
+    
+    if (days <= 2) {
+      // Short Gangtok-focused trips
+      plans.push({
+        day: 1,
+        title: "Gangtok Sacred Discovery",
+        monasteries: [
+          'Enchey Monastery (2 hours) - 200-year-old Nyingma monastery', 
+          'Do Drul Chorten (1.5 hours) - Sacred stupa with 108 prayer wheels'
+        ],
+        accommodation: budget ? 'Budget hotel/hostel - ₹1,500/night' : 'Good hotel - ₹4,500/night',
+        meals: ['Breakfast: ₹200', 'Local lunch (Thukpa/Momos): ₹400', 'Traditional dinner: ₹600'],
+        transport: 'Local taxi + walking - ₹800',
+        cost: budget ? 3500 : 6500,
+        tips: [
+          'Start with Do Drul Chorten for spiritual blessings',
+          'Enchey offers beautiful panoramic city views',
+          'Respect photography restrictions in prayer halls',
+          'Dress warmly - mountain weather changes quickly'
+        ]
+      })
+      
+      if (days === 2) {
+        plans.push({
+          day: 2,
+          title: "Rumtek Sacred Journey",
+          monasteries: [
+            'Rumtek Monastery (3-4 hours) - Seat of 17th Karmapa, most important Kagyu monastery'
+          ],
+          accommodation: 'Same as Day 1',
+          meals: ['Hotel breakfast: ₹200', 'Monastery canteen lunch: ₹150', 'Gangtok dinner: ₹500'],
+          transport: 'Round trip taxi to Rumtek (24 km) - ₹1,500',
+          cost: budget ? 3850 : 6350,
+          tips: [
+            'Early morning departure recommended (8 AM)',
+            'Golden Buddha hall and precious artifacts are spectacular',
+            'Monks may allow Q&A sessions about Buddhism',
+            'Allow extra time for photography and meditation'
+          ]
+        })
+      }
+    } else if (days <= 5) {
+      // Medium trips covering East and West Sikkim
+      plans.push({
+        day: 1,
+        title: "Arrival & Gentle Introduction",
+        monasteries: [
+          'Do Drul Chorten (evening visit) - Sacred stupa circumambulation for travel blessings'
+        ],
+        accommodation: budget ? 'Clean guesthouse - ₹1,800/night' : 'Heritage hotel - ₹5,500/night',
+        meals: ['Airport/station pickup lunch: ₹500', 'Welcome traditional dinner: ₹800'],
+        transport: 'Airport/station transfer + city orientation - ₹1,200',
+        cost: budget ? 4300 : 8000,
+        tips: [
+          'Gentle start for altitude acclimatization',
+          'Light activities only on arrival day',
+          'Hydrate well and avoid alcohol',
+          'Early dinner and good rest recommended'
+        ]
+      })
+      
+      plans.push({
+        day: 2,
+        title: "Gangtok Monastery Trail",
+        monasteries: [
+          'Enchey Monastery (morning) - Historical Nyingma monastery with city views',
+          'Rumtek Monastery (afternoon) - Most sacred Kagyu monastery, seat of Karmapa'
+        ],
+        accommodation: 'Same as Day 1',
+        meals: ['Hotel breakfast: ₹300', 'Monastery simple lunch: ₹200', 'City restaurant dinner: ₹700'],
+        transport: 'Full day taxi service - ₹2,000',
+        cost: budget ? 4000 : 7200,
+        tips: [
+          'Early start at 8 AM to cover both monasteries',
+          'Photography allowed in designated areas only',
+          'Witness morning prayers if timing permits',
+          'Learn about different Buddhist traditions - Nyingma vs Kagyu'
+        ]
+      })
+      
+      if (days >= 3) {
+        plans.push({
+          day: 3,
+          title: "West Sikkim Journey - Pelling",
+          monasteries: [
+            'Pemayangtse Monastery (afternoon) - Oldest monastery in Sikkim, pure lineage monks only'
+          ],
+          accommodation: budget ? 'Pelling mountain guesthouse - ₹2,200/night' : 'Resort with Kanchenjunga views - ₹7,000/night',
+          meals: ['Hotel breakfast: ₹250', 'Travel lunch en route: ₹400', 'Pelling local dinner: ₹600'],
+          transport: 'Gangtok to Pelling scenic drive (115 km, 4 hours) - ₹2,800',
+          cost: budget ? 6250 : 11050,
+          tips: [
+            'Beautiful 4-hour mountain journey with stops',
+            'Pemayangtse meaning "Perfect Sublime Lotus"',
+            'Check sunset views of Kanchenjunga from hotel',
+            'Carry motion sickness medicine for winding roads'
+          ]
+        })
+      }
+      
+      if (days >= 4) {
+        plans.push({
+          day: 4,
+          title: "Sacred Tashiding Experience",
+          monasteries: [
+            'Tashiding Monastery (full morning) - Holiest monastery in Sikkim, hilltop location'
+          ],
+          accommodation: budget ? 'Same as Day 3' : 'Same as Day 3',
+          meals: ['Early breakfast: ₹200', 'Packed monastery lunch: ₹300', 'Traditional dinner: ₹700'],
+          transport: 'Day trip to Tashiding (80 km round trip) - ₹3,500',
+          cost: budget ? 6000 : 9500,
+          tips: [
+            'Most sacred monastery - believed to cleanse sins by mere sight',
+            'Stunning 360-degree Himalayan views from hilltop',
+            'Site of famous Bhumchu (holy water) festival',
+            'Guru Rinpoche meditation cave nearby'
+          ]
+        })
+      }
+      
+      if (days === 5) {
+        plans.push({
+          day: 5,
+          title: "Departure Day",
+          monasteries: [
+            winter ? 'Local morning prayers at nearby monastery' : 'Optional North Sikkim monastery (if permits available)'
+          ],
+          accommodation: 'Checkout',
+          meals: ['Final breakfast: ₹250', 'Travel meal: ₹400'],
+          transport: 'Return journey to departure point - ₹2,500',
+          cost: 3150,
+          tips: [
+            'Early checkout and departure recommended',
+            'Purchase authentic souvenirs from monastery shops',
+            'Final blessing ceremony if available',
+            'Safe journey back with lifetime memories'
+          ]
+        })
+      }
+    } else {
+      // Extended trips (6+ days) - Add North Sikkim if accessible
+      plans.push(...generateExtendedItinerary(days, budget, winter))
+    }
+    
+    return plans
+  }
 
-export default function TravelPlannerPage() {
-  const [selectedMonasteries, setSelectedMonasteries] = useState<number[]>([])
-  const [tripDuration, setTripDuration] = useState("3")
-  const [travelers, setTravelers] = useState("2")
-  const [budget, setBudget] = useState("medium")
-  const [interests, setInterests] = useState<string[]>([])
-  const [startDate, setStartDate] = useState("")
-  const [accommodation, setAccommodation] = useState("")
-  const [transport, setTransport] = useState("")
+  const generateExtendedItinerary = (days: number, budget: boolean, winter: boolean) => {
+    // Extended itinerary logic for longer trips
+    return [
+      {
+        day: 1,
+        title: "Grand Arrival & Sacred Introduction",
+        monasteries: ['Do Drul Chorten evening blessing ceremony'],
+        accommodation: budget ? 'Heritage homestay - ₹2,000' : 'Luxury mountain resort - ₹18,000',
+        meals: ['Welcome lunch - ₹600', 'Cultural dinner show - ₹1,200'],
+        transport: 'Premium pickup + orientation tour - ₹1,500',
+        cost: budget ? 5300 : 21300,
+        tips: ['Cultural orientation', 'Gentle acclimatization', 'Traditional welcome ceremony']
+      },
+      // Additional days would be generated here based on duration
+    ]
+  }
 
-  const handleMonasteryToggle = (monasteryId: number) => {
-    setSelectedMonasteries((prev) =>
-      prev.includes(monasteryId) ? prev.filter((id) => id !== monasteryId) : [...prev, monasteryId],
+  const interests = [
+    'Buddhist Philosophy', 'Photography', 'Architecture', 'Meditation',
+    'Cultural History', 'Mountain Views', 'Local Cuisine', 'Handicrafts'
+  ]
+
+  const toggleInterest = (interest: string) => {
+    setFormData(prev => ({
+      ...prev,
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter(i => i !== interest)
+        : [...prev.interests, interest]
+    }))
+  }
+
+  if (generatedGuide) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-8 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-green-800 mb-4">
+              🗺️ Your Personalized Sikkim Guide
+            </h1>
+            <p className="text-lg text-gray-600 mb-4">{generatedGuide.summary}</p>
+            <Badge className="bg-green-600 text-white px-6 py-3 text-lg">
+              Total Budget: ₹{generatedGuide.totalBudget.toLocaleString()}
+            </Badge>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main Itinerary */}
+            <div className="lg:col-span-2 space-y-6">
+              <h2 className="text-2xl font-bold text-blue-800 mb-4">📅 Complete Day-wise Itinerary</h2>
+              
+              {generatedGuide.itinerary.map((day: any, index: number) => (
+                <Card key={index} className="shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-green-500 to-blue-500 text-white">
+                    <CardTitle className="text-xl">Day {day.day}: {day.title}</CardTitle>
+                    <Badge className="bg-white/20 text-white w-fit">
+                      Daily Budget: ₹{day.cost.toLocaleString()}
+                    </Badge>
+                  </CardHeader>
+                  <CardContent className="space-y-6 pt-6">
+                    <div>
+                      <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                        🏛️ Monastery Visits
+                      </h4>
+                      <div className="space-y-2">
+                        {day.monasteries.map((monastery: string, idx: number) => (
+                          <div key={idx} className="text-gray-700 bg-orange-50 p-3 rounded-lg">
+                            • {monastery}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-semibold text-blue-800 mb-2">🏨 Accommodation</h4>
+                        <p className="text-gray-700 bg-blue-50 p-3 rounded-lg">{day.accommodation}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-purple-800 mb-2">🚗 Transportation</h4>
+                        <p className="text-gray-700 bg-purple-50 p-3 rounded-lg">{day.transport}</p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-orange-800 mb-2">🍽️ Meals & Costs</h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        {day.meals.map((meal: string, idx: number) => (
+                          <div key={idx} className="text-gray-700 bg-yellow-50 p-2 rounded text-sm">
+                            • {meal}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-green-800 mb-3">💡 Essential Tips for Day {day.day}</h4>
+                      <ul className="space-y-1">
+                        {day.tips.map((tip: string, idx: number) => (
+                          <li key={idx} className="text-green-700 text-sm">• {tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-green-800">🎒 Packing Essentials</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {generatedGuide.essentials.map((item: string, index: number) => (
+                      <li key={index} className="text-sm text-gray-600 flex items-center gap-2">
+                        <input type="checkbox" className="rounded" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-orange-800">⚡ Important Travel Tips</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {generatedGuide.tips.map((tip: string, index: number) => (
+                      <li key={index} className="text-sm text-gray-600">{tip}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg border-red-200">
+                <CardHeader>
+                  <CardTitle className="text-red-800">📞 Emergency Contacts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {generatedGuide.contacts.map((contact: string, index: number) => (
+                      <li key={index} className="text-sm text-red-700 font-medium">{contact}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => window.print()}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors"
+                >
+                  📄 Print Complete Guide
+                </button>
+                <button
+                  onClick={() => setGeneratedGuide(null)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors"
+                >
+                  🔄 Plan New Trip
+                </button>
+                <Link 
+                  href="/monasteries"
+                  className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-3 px-4 rounded-lg font-semibold transition-colors"
+                >
+                  🏛️ Explore Monasteries
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 
-  const handleInterestToggle = (interest: string) => {
-    setInterests((prev) => (prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest]))
-  }
-
-  const generateItinerary = () => {
-    // Mock itinerary generation logic
-    console.log("Generating itinerary with:", {
-      monasteries: selectedMonasteries,
-      duration: tripDuration,
-      travelers,
-      budget,
-      interests,
-      startDate,
-    })
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Plan Your Spiritual Journey</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-pretty">
-            Create a personalized itinerary for your monastery visits in Sikkim. Get recommendations for accommodations,
-            transportation, and the perfect spiritual experience.
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-8 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-green-800 mb-4">
+            📋 Plan Your Visit
+          </h1>
+          <p className="text-lg text-gray-600 mb-2">
+            Create your perfect monastery journey through Sikkim
+          </p>
+          <p className="text-sm text-gray-500">
+            Fill in your preferences and get a detailed, personalized travel guide
           </p>
         </div>
 
-        <Tabs defaultValue="planner" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="planner">Trip Planner</TabsTrigger>
-            <TabsTrigger value="itinerary">My Itinerary</TabsTrigger>
-            <TabsTrigger value="accommodations">Stay</TabsTrigger>
-            <TabsTrigger value="transport">Transport</TabsTrigger>
-          </TabsList>
-
-          {/* Trip Planner Tab */}
-          <TabsContent value="planner" className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Planning Form */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Basic Details */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Trip Details</CardTitle>
-                    <CardDescription>Tell us about your planned visit</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="start-date">Start Date</Label>
-                        <Input
-                          id="start-date"
-                          type="date"
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="duration">Duration (days)</Label>
-                        <Select value={tripDuration} onValueChange={setTripDuration}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select duration" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">1 Day</SelectItem>
-                            <SelectItem value="2">2 Days</SelectItem>
-                            <SelectItem value="3">3 Days</SelectItem>
-                            <SelectItem value="4">4 Days</SelectItem>
-                            <SelectItem value="5">5 Days</SelectItem>
-                            <SelectItem value="7">1 Week</SelectItem>
-                            <SelectItem value="14">2 Weeks</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="travelers">Number of Travelers</Label>
-                        <Select value={travelers} onValueChange={setTravelers}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select travelers" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">1 Person</SelectItem>
-                            <SelectItem value="2">2 People</SelectItem>
-                            <SelectItem value="3">3 People</SelectItem>
-                            <SelectItem value="4">4 People</SelectItem>
-                            <SelectItem value="5+">5+ People</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="budget">Budget Range</Label>
-                        <Select value={budget} onValueChange={setBudget}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select budget" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="low">Budget (₹1,000-3,000/day)</SelectItem>
-                            <SelectItem value="medium">Moderate (₹3,000-7,000/day)</SelectItem>
-                            <SelectItem value="high">Luxury (₹7,000+/day)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Monastery Selection */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Select Monasteries to Visit</CardTitle>
-                    <CardDescription>Choose the monasteries you'd like to include in your journey</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {monasteries.map((monastery) => (
-                        <div
-                          key={monastery.id}
-                          className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50"
-                        >
-                          <Checkbox
-                            id={`monastery-${monastery.id}`}
-                            checked={selectedMonasteries.includes(monastery.id)}
-                            onCheckedChange={() => handleMonasteryToggle(monastery.id)}
-                          />
-                          <div className="flex-1">
-                            <Label htmlFor={`monastery-${monastery.id}`} className="font-medium cursor-pointer">
-                              {monastery.name}
-                            </Label>
-                            <div className="text-sm text-muted-foreground">
-                              {monastery.location} • {monastery.duration} • {monastery.difficulty}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Interests */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Your Interests</CardTitle>
-                    <CardDescription>What aspects of monastery visits interest you most?</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {[
-                        "Meditation",
-                        "Architecture",
-                        "History",
-                        "Photography",
-                        "Cultural Events",
-                        "Spiritual Learning",
-                        "Art & Murals",
-                        "Traditional Music",
-                        "Local Cuisine",
-                      ].map((interest) => (
-                        <div key={interest} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`interest-${interest}`}
-                            checked={interests.includes(interest)}
-                            onCheckedChange={() => handleInterestToggle(interest)}
-                          />
-                          <Label htmlFor={`interest-${interest}`} className="text-sm cursor-pointer">
-                            {interest}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Generate Button */}
-                <Button onClick={generateItinerary} size="lg" className="w-full">
-                  <Route className="h-5 w-5 mr-2" />
-                  Generate My Itinerary
-                </Button>
-              </div>
-
-              {/* Planning Summary */}
+        <Card className="shadow-2xl">
+          <CardHeader className="bg-gradient-to-r from-green-500 to-blue-500 text-white">
+            <CardTitle className="text-2xl text-center">
+              🎯 Your Travel Preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8 space-y-8">
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Left Column */}
               <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Trip Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Duration</span>
-                      <span className="font-medium">{tripDuration} days</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Travelers</span>
-                      <span className="font-medium">{travelers} people</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Monasteries</span>
-                      <span className="font-medium">{selectedMonasteries.length} selected</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Budget</span>
-                      <Badge variant="outline">
-                        {budget === "low" ? "Budget" : budget === "medium" ? "Moderate" : "Luxury"}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    📍 Starting from
+                  </label>
+                  <select
+                    value={formData.startLocation}
+                    onChange={(e) => setFormData(prev => ({...prev, startLocation: e.target.value}))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Select your starting point</option>
+                    <option value="bagdogra">Bagdogra Airport (IXB)</option>
+                    <option value="siliguri">Siliguri/New Jalpaiguri (NJP)</option>
+                    <option value="gangtok">Already in Gangtok</option>
+                    <option value="darjeeling">Darjeeling</option>
+                    <option value="other">Other location</option>
+                  </select>
+                </div>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Quick Tips</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start space-x-2">
-                      <Mountain className="h-4 w-4 text-primary mt-1" />
-                      <p className="text-sm">Best time to visit: March-June, September-December</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <Clock className="h-4 w-4 text-primary mt-1" />
-                      <p className="text-sm">Most monasteries open from 6 AM to 6 PM</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <Users className="h-4 w-4 text-primary mt-1" />
-                      <p className="text-sm">Dress modestly and remove shoes before entering halls</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    📅 How many days do you have?
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {['1', '2', '3', '4', '5', '7', '10'].map((days) => (
+                      <button
+                        key={days}
+                        onClick={() => setFormData(prev => ({...prev, duration: days}))}
+                        className={`p-3 rounded-lg text-sm font-medium transition-colors ${
+                          formData.duration === days
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        }`}
+                      >
+                        {days} Day{days !== '1' ? 's' : ''}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    💰 Budget preference per person
+                  </label>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, budget: 'budget'}))}
+                      className={`w-full p-4 rounded-lg text-left transition-colors ${
+                        formData.budget === 'budget'
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Budget Travel</div>
+                      <div className="text-sm opacity-75">₹3,000-4,000 per day</div>
+                      <div className="text-xs opacity-60">Hostels, shared transport, local food</div>
+                    </button>
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, budget: 'comfort'}))}
+                      className={`w-full p-4 rounded-lg text-left transition-colors ${
+                        formData.budget === 'comfort'
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Comfortable Travel</div>
+                      <div className="text-sm opacity-75">₹6,000-10,000 per day</div>
+                      <div className="text-xs opacity-60">Good hotels, private transport, quality meals</div>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    🗓️ When are you planning to visit?
+                  </label>
+                  <select
+                    value={formData.travelMonth}
+                    onChange={(e) => setFormData(prev => ({...prev, travelMonth: e.target.value}))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Select travel month</option>
+                    {['January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'].map((month) => (
+                      <option key={month} value={month}>{month}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    👥 Group size
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="15"
+                    value={formData.groupSize}
+                    onChange={(e) => setFormData(prev => ({...prev, groupSize: parseInt(e.target.value) || 1}))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Number of travelers"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    💪 Physical fitness & travel style
+                  </label>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, physicalFitness: 'low'}))}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        formData.physicalFitness === 'low'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Relaxed Explorer</div>
+                      <div className="text-sm opacity-75">Easy walks, comfortable pace, minimal altitude</div>
+                    </button>
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, physicalFitness: 'moderate'}))}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        formData.physicalFitness === 'moderate'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Balanced Traveler</div>
+                      <div className="text-sm opacity-75">Moderate walking, some hills, balanced itinerary</div>
+                    </button>
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, physicalFitness: 'high'}))}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        formData.physicalFitness === 'high'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Adventure Seeker</div>
+                      <div className="text-sm opacity-75">Love trekking, high altitude, packed schedule</div>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    ❤️ What interests you most? (select multiple)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {interests.map((interest) => (
+                      <button
+                        key={interest}
+                        onClick={() => toggleInterest(interest)}
+                        className={`p-2 rounded text-sm transition-colors ${
+                          formData.interests.includes(interest)
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        }`}
+                      >
+                        {interest}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    🚗 Transportation preference
+                  </label>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, transport: 'shared'}))}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        formData.transport === 'shared'
+                          ? 'bg-orange-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Shared Vehicles</div>
+                      <div className="text-sm opacity-75">Budget-friendly, meet locals, fixed schedules</div>
+                    </button>
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, transport: 'private'}))}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        formData.transport === 'private'
+                          ? 'bg-orange-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Private Transport</div>
+                      <div className="text-sm opacity-75">Flexible timing, comfort, higher cost</div>
+                    </button>
+                    <button
+                      onClick={() => setFormData(prev => ({...prev, transport: 'mix'}))}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        formData.transport === 'mix'
+                          ? 'bg-orange-600 text-white'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-medium">Mixed Approach</div>
+                      <div className="text-sm opacity-75">Best value combination of both</div>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </TabsContent>
 
-          {/* Itinerary Tab */}
-          <TabsContent value="itinerary" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Your Spiritual Journey Itinerary</CardTitle>
-                    <CardDescription>3-day monastery tour in Sikkim</CardDescription>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download PDF
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </Button>
-                  </div>
+            <div className="text-center pt-6">
+              {isGenerating ? (
+                <div className="space-y-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+                  <p className="text-green-600 font-medium">
+                    🤖 Creating your personalized monastery travel guide...
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Analyzing your preferences and optimizing the perfect itinerary
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {/* Day 1 */}
-                  <div className="border-l-4 border-primary pl-6">
-                    <h3 className="text-lg font-semibold mb-3">Day 1 - East Sikkim Exploration</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium min-w-[80px] text-center">
-                          9:00 AM
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">Rumtek Monastery Visit</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Explore the largest monastery in Sikkim, witness morning prayers
-                          </p>
-                          <div className="flex items-center space-x-2 mt-2">
-                            <Badge variant="outline" className="text-xs">
-                              3-4 hours
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              Easy access
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded text-sm font-medium min-w-[80px] text-center">
-                          2:00 PM
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">Lunch at Local Restaurant</h4>
-                          <p className="text-muted-foreground text-sm">Traditional Sikkimese cuisine near Rumtek</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium min-w-[80px] text-center">
-                          4:00 PM
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">Enchey Monastery</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Visit the 200-year-old monastery with city views
-                          </p>
-                          <div className="flex items-center space-x-2 mt-2">
-                            <Badge variant="outline" className="text-xs">
-                              1-2 hours
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              Easy access
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Day 2 */}
-                  <div className="border-l-4 border-secondary pl-6">
-                    <h3 className="text-lg font-semibold mb-3">Day 2 - West Sikkim Journey</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium min-w-[80px] text-center">
-                          8:00 AM
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">Travel to Pelling</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Scenic drive through mountain roads (3-4 hours)
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium min-w-[80px] text-center">
-                          1:00 PM
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">Pemayangtse Monastery</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Explore one of Sikkim's oldest monasteries with Kanchenjunga views
-                          </p>
-                          <div className="flex items-center space-x-2 mt-2">
-                            <Badge variant="outline" className="text-xs">
-                              2-3 hours
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              Moderate access
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Day 3 */}
-                  <div className="border-l-4 border-accent pl-6">
-                    <h3 className="text-lg font-semibold mb-3">Day 3 - Sacred Sites & Departure</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium min-w-[80px] text-center">
-                          9:00 AM
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">Tashiding Monastery</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Visit the sacred hilltop monastery with valley views
-                          </p>
-                          <div className="flex items-center space-x-2 mt-2">
-                            <Badge variant="outline" className="text-xs">
-                              2-3 hours
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              Moderate access
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded text-sm font-medium min-w-[80px] text-center">
-                          2:00 PM
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">Return Journey</h4>
-                          <p className="text-muted-foreground text-sm">Travel back to Gangtok or departure point</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Accommodations Tab */}
-          <TabsContent value="accommodations" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {accommodations.map((hotel) => (
-                <Card key={hotel.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{hotel.name}</CardTitle>
-                        <CardDescription className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-1" />
-                          {hotel.location}
-                        </CardDescription>
-                      </div>
-                      <Badge variant="outline">{hotel.type}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                        <span className="text-sm font-medium">{hotel.rating}</span>
-                      </div>
-                      <span className="font-semibold text-primary">{hotel.price}</span>
-                    </div>
-                    <Button className="w-full">
-                      <Hotel className="h-4 w-4 mr-2" />
-                      Book Now
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+              ) : (
+                <button
+                  onClick={generateGuide}
+                  disabled={!formData.startLocation || !formData.duration || !formData.budget || !formData.travelMonth}
+                  className={`px-12 py-4 rounded-lg text-lg font-semibold transition-all duration-300 ${
+                    formData.startLocation && formData.duration && formData.budget && formData.travelMonth
+                      ? 'bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  🚀 Generate My Travel Guide
+                </button>
+              )}
+              
+              {(!formData.startLocation || !formData.duration || !formData.budget || !formData.travelMonth) && (
+                <p className="text-sm text-gray-500 mt-3">
+                  Please fill all required fields to generate your guide
+                </p>
+              )}
             </div>
-          </TabsContent>
-
-          {/* Transport Tab */}
-          <TabsContent value="transport" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {transportOptions.map((option) => (
-                <Card key={option.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      {option.type === "Flight" && <Plane className="h-5 w-5 text-primary" />}
-                      {option.type === "Train" && <Train className="h-5 w-5 text-primary" />}
-                      {option.type === "Car Rental" && <Car className="h-5 w-5 text-primary" />}
-                      {option.type === "Taxi" && <Car className="h-5 w-5 text-primary" />}
-                      <CardTitle className="text-lg">{option.type}</CardTitle>
-                    </div>
-                    <CardDescription>
-                      {option.from && option.to ? `${option.from} to ${option.to}` : option.location}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{option.duration}</span>
-                      </div>
-                      <span className="font-semibold text-primary">{option.price}</span>
-                    </div>
-                    <Button className="w-full">Book {option.type}</Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

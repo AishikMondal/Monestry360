@@ -1,0 +1,213 @@
+-- SQL script to populate the monasteries table in Supabase
+-- Run this in your Supabase SQL editor to add all monastery data
+
+-- First, create the monasteries table if it doesn't exist
+CREATE TABLE IF NOT EXISTS public.monasteries (
+  id TEXT PRIMARY KEY,
+  monastery_name TEXT NOT NULL,
+  district TEXT NOT NULL,
+  address TEXT NOT NULL,
+  latitude DECIMAL(10, 8) NOT NULL,
+  longitude DECIMAL(11, 8) NOT NULL,
+  description TEXT,
+  founded_year INTEGER,
+  monastery_type TEXT,
+  visiting_hours TEXT,
+  entry_fee INTEGER DEFAULT 0,
+  contact_phone TEXT,
+  website TEXT,
+  image_url TEXT,
+  history TEXT,
+  architecture TEXT,
+  festivals TEXT,
+  significance TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.monasteries ENABLE ROW LEVEL SECURITY;
+
+-- Create a policy that allows everyone to read monasteries
+CREATE POLICY "Anyone can view monasteries" ON public.monasteries
+  FOR SELECT USING (true);
+
+-- Insert all 8 monasteries data
+INSERT INTO public.monasteries (
+  id, monastery_name, district, address, latitude, longitude, description, 
+  founded_year, monastery_type, visiting_hours, entry_fee, contact_phone, 
+  image_url, history, architecture, festivals, significance
+) VALUES 
+(
+  '1',
+  'Rumtek Monastery',
+  'East Sikkim',
+  'Rumtek, East Sikkim 737135',
+  27.3153,
+  88.5502,
+  'Rumtek Monastery is one of the most significant monasteries in Sikkim and serves as the seat of the Karmapa, head of the Karma Kagyu lineage. Built in the 1960s, this magnificent monastery houses many precious Buddhist artifacts, ancient scriptures, and religious treasures.',
+  1966,
+  'Karma Kagyu',
+  '6:00 AM - 6:00 PM',
+  0,
+  '+91-3592-252523',
+  'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&h=600&fit=crop',
+  'Rumtek Monastery was built in 1740 by Changchub Dorje, 12th Karmapa Lama. The monastery was later rebuilt in the 1960s by the 16th Karmapa after he fled Tibet. It serves as the main seat of the Kagyu lineage of Tibetan Buddhism.',
+  'The monastery features traditional Tibetan architecture with intricate woodwork, colorful murals, and golden roofs. The main shrine hall houses a large golden Buddha statue and numerous thangka paintings.',
+  'Cham Dance Festival (annual masked dance), Losar (Tibetan New Year), Buddha Jayanti. The monastery comes alive during these festivals with colorful ceremonies and traditional music.',
+  'As the seat of the Karmapa, Rumtek is one of the most important Kagyu monasteries outside Tibet. It houses the sacred Black Crown of the Karmapa and numerous precious relics.'
+),
+(
+  '2',
+  'Enchey Monastery',
+  'East Sikkim',
+  'Gangtok, Sikkim 737101',
+  27.3389,
+  88.6065,
+  'Enchey Monastery is a 200-year-old Buddhist monastery located in Gangtok. Belonging to the Nyingma order of Vajrayana Buddhism, it stands as a testament to Sikkim''s rich spiritual heritage.',
+  1840,
+  'Nyingma',
+  '5:00 AM - 7:00 PM',
+  0,
+  '+91-3592-202596',
+  'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=800&h=600&fit=crop',
+  'Founded in 1840 by Lama Druptob Karpo, Enchey Monastery was built on the site blessed by Lama Druptob Karpo, who was believed to have flying powers. The name "Enchey" means "solitary temple".',
+  'Built in traditional Buddhist architectural style, the monastery features a main prayer hall with beautiful murals depicting Buddhist deities and scenes from Buddha''s life.',
+  'Cham Dance is performed annually on the 18th and 19th days of the 12th month of the Tibetan calendar. Losar celebrations are also held with great fervor.',
+  'The monastery is famous for its annual Cham dance and is considered one of the most important Nyingma monasteries in Sikkim.'
+),
+(
+  '3',
+  'Do Drul Chorten',
+  'East Sikkim',
+  'Gangtok, East Sikkim',
+  27.3270,
+  88.6051,
+  'Do Drul Chorten is one of the most important stupas in Sikkim. Built in 1945, it contains complete Dorjee Phurba, Kangyur relics and other sacred objects.',
+  1945,
+  'Nyingma',
+  '5:00 AM - 8:00 PM',
+  0,
+  NULL,
+  'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
+  'Built in 1945 by Trulshik Rinpoche, Do Drul Chorten is surrounded by 108 Mani Lhakors (prayer wheels). The stupa was built to ward off evil spirits and bring peace to the region.',
+  'The stupa follows traditional Tibetan Buddhist architecture with a square base, circular middle section, and spire topped with a golden pinnacle. It is surrounded by colorful prayer flags.',
+  'Buddha Purnima, Losar (Tibetan New Year), and various prayer ceremonies are held throughout the year.',
+  'This stupa is considered highly sacred and is believed to contain powerful relics. Devotees circumambulate the stupa while spinning prayer wheels.'
+),
+(
+  '4',
+  'Pemayangtse Monastery',
+  'West Sikkim',
+  'Pelling, West Sikkim 737113',
+  27.2151,
+  88.2468,
+  'Pemayangtse Monastery is one of the oldest and premier monasteries of Sikkim. Built in 1705, it is the head monastery of the Nyingma order.',
+  1705,
+  'Nyingma',
+  '7:00 AM - 5:00 PM',
+  10,
+  '+91-3595-250658',
+  'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop',
+  'Founded by Lama Lhatsun Chempo in 1705, Pemayangtse was built as the head monastery of the Nyingma sect. It played a crucial role in crowning the Chogyals (kings) of Sikkim.',
+  'This three-story monastery showcases exquisite Tibetan architecture with intricate wood carvings, paintings, and sculptures. The top floor houses a wooden sculpture of Guru Rinpoche''s heavenly palace.',
+  'Cham Dance during the 28th and 29th days of the 12th Tibetan month, Losar celebrations, and various Buddhist festivals.',
+  'Only monks of pure Tibetan lineage can become monks here. It houses many ancient Buddhist scriptures, statues, and paintings.'
+),
+(
+  '5',
+  'Tashiding Monastery',
+  'West Sikkim',
+  'Tashiding, West Sikkim',
+  27.3404,
+  88.2717,
+  'Tashiding Monastery is regarded as the holiest of all monasteries in Sikkim. Located on a hilltop, it offers breathtaking views of the surrounding mountains.',
+  1641,
+  'Nyingma',
+  '6:00 AM - 6:00 PM',
+  0,
+  NULL,
+  'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=800&h=600&fit=crop',
+  'Built in 1641 by Ngadak Sempa Chenpo, Tashiding means "The Devoted Central Glory". The monastery is built on the site where Guru Rinpoche meditated.',
+  'Perched on a hilltop with panoramic views, the monastery features traditional Tibetan architecture with prayer flags fluttering in the mountain breeze.',
+  'Bhumchu Festival (holy water ceremony), Losar, and various religious ceremonies. The Bhumchu Festival is particularly famous.',
+  'Considered the most sacred monastery in Sikkim, it is believed that a mere sight of this monastery cleanses one of all sins.'
+),
+(
+  '6',
+  'Phodong Monastery',
+  'North Sikkim',
+  'Phodong, North Sikkim',
+  27.4711,
+  88.5747,
+  'Phodong Monastery is one of the six most important monasteries of Sikkim. It was reconstructed in 1977 and houses many ancient Buddhist scriptures.',
+  1740,
+  'Kagyu',
+  '6:00 AM - 5:00 PM',
+  0,
+  NULL,
+  'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=600&fit=crop',
+  'Originally built in 1740 by Chogyal Gyurmed Namgyal, it was reconstructed in 1977 after being damaged. It belongs to the Kagyu sect of Tibetan Buddhism.',
+  'The monastery showcases beautiful Tibetan architecture with colorful murals, prayer wheels, and traditional Buddhist symbols.',
+  'Annual Cham Dance, Losar celebrations, and various Buddhist festivals are celebrated with great enthusiasm.',
+  'Known for its annual Cham dance and beautiful location amidst rhododendron forests.'
+),
+(
+  '7',
+  'Labrang Monastery',
+  'North Sikkim',
+  'Lachen, North Sikkim',
+  27.5000,
+  88.5500,
+  'Labrang Monastery is located in the beautiful valley of Lachen. It is known for its peaceful environment and traditional Buddhist architecture.',
+  1806,
+  'Nyingma',
+  '7:00 AM - 4:00 PM',
+  0,
+  NULL,
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+  'Built in 1806, Labrang Monastery serves the Buddhist community in the remote northern region of Sikkim. It provides spiritual guidance to the local population.',
+  'Simple yet elegant Tibetan architecture adapted to the harsh mountain climate, featuring thick walls and sloped roofs.',
+  'Losar (Tibetan New Year), local harvest festivals, and Buddhist prayer ceremonies.',
+  'Serves as an important spiritual center for the remote communities of North Sikkim.'
+),
+(
+  '8',
+  'Ralang Monastery',
+  'South Sikkim',
+  'Ralang, South Sikkim',
+  27.1500,
+  88.5000,
+  'Ralang Monastery is known for its annual Kagyed dance festival. The monastery houses beautiful murals and ancient Buddhist texts.',
+  1768,
+  'Kagyu',
+  '6:00 AM - 6:00 PM',
+  5,
+  NULL,
+  'https://images.unsplash.com/photo-1591123720511-7637d5d3ffe4?w=800&h=600&fit=crop',
+  'Founded in 1768 by the fourth Chogyal Tenzin Namgyal, Ralang Monastery belongs to the Kagyu sect and is famous for its Kagyed dance.',
+  'Traditional Tibetan monastic architecture with beautiful wall paintings, statues, and a peaceful courtyard for meditation.',
+  'Famous for the Kagyed dance performed during the 28th and 29th days of the 10th Tibetan month, along with other Buddhist festivals.',
+  'Known as one of the most important Kagyu monasteries in South Sikkim and famous for its sacred dances.'
+)
+ON CONFLICT (id) DO UPDATE SET
+  monastery_name = EXCLUDED.monastery_name,
+  district = EXCLUDED.district,
+  address = EXCLUDED.address,
+  latitude = EXCLUDED.latitude,
+  longitude = EXCLUDED.longitude,
+  description = EXCLUDED.description,
+  founded_year = EXCLUDED.founded_year,
+  monastery_type = EXCLUDED.monastery_type,
+  visiting_hours = EXCLUDED.visiting_hours,
+  entry_fee = EXCLUDED.entry_fee,
+  contact_phone = EXCLUDED.contact_phone,
+  image_url = EXCLUDED.image_url,
+  history = EXCLUDED.history,
+  architecture = EXCLUDED.architecture,
+  festivals = EXCLUDED.festivals,
+  significance = EXCLUDED.significance,
+  updated_at = TIMEZONE('utc'::text, NOW());
+
+-- Verify the data was inserted
+SELECT id, monastery_name, district FROM public.monasteries ORDER BY id;
