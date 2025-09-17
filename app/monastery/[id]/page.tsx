@@ -104,8 +104,8 @@ export default function MonasteryDetailPage() {
             festivals: 'Cham Dance is performed annually on the 18th and 19th days of the 12th month of the Tibetan calendar. Losar celebrations are also held with great fervor.',
             significance: 'The monastery is famous for its annual Cham dance and is considered one of the most important Nyingma monasteries in Sikkim.'
           },
-          '3': {
-            id: '3',
+          '8': {
+            id: '8',
             monastery_name: 'Do Drul Chorten',
             district: 'East Sikkim',
             address: 'Gangtok, East Sikkim',
@@ -116,14 +116,14 @@ export default function MonasteryDetailPage() {
             monastery_type: 'Nyingma',
             visiting_hours: '5:00 AM - 8:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
+            image_url: 'https://i.postimg.cc/qRF13LZM/Gemini-Generated-Image-gb4tqegb4tqegb4t-1.png?w=800&h=600&fit=crop',
             history: 'Built in 1945 by Trulshik Rinpoche, Do Drul Chorten is surrounded by 108 Mani Lhakors (prayer wheels). The stupa was built to ward off evil spirits and bring peace to the region.',
             architecture: 'The stupa follows traditional Tibetan Buddhist architecture with a square base, circular middle section, and spire topped with a golden pinnacle. It is surrounded by colorful prayer flags.',
             festivals: 'Buddha Purnima, Losar (Tibetan New Year), and various prayer ceremonies are held throughout the year.',
             significance: 'This stupa is considered highly sacred and is believed to contain powerful relics. Devotees circumambulate the stupa while spinning prayer wheels.'
           },
-          '4': {
-            id: '4',
+          '3': {
+            id: '3',
             monastery_name: 'Pemayangtse Monastery',
             district: 'West Sikkim',
             address: 'Pelling, West Sikkim 737113',
@@ -141,8 +141,8 @@ export default function MonasteryDetailPage() {
             festivals: 'Cham Dance during the 28th and 29th days of the 12th Tibetan month, Losar celebrations, and various Buddhist festivals.',
             significance: 'Only monks of pure Tibetan lineage can become monks here. It houses many ancient Buddhist scriptures, statues, and paintings.'
           },
-          '5': {
-            id: '5',
+          '4': {
+            id: '4',
             monastery_name: 'Tashiding Monastery',
             district: 'West Sikkim',
             address: 'Tashiding, West Sikkim',
@@ -153,14 +153,14 @@ export default function MonasteryDetailPage() {
             monastery_type: 'Nyingma',
             visiting_hours: '6:00 AM - 6:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=800&h=600&fit=crop',
+            image_url: 'https://i.postimg.cc/v89rhb4v/Gemini-Generated-Image-qoqvp0qoqvp0qoqv.png?w=800&h=600&fit=crop',
             history: 'Built in 1641 by Ngadak Sempa Chenpo, Tashiding means "The Devoted Central Glory". The monastery is built on the site where Guru Rinpoche meditated.',
             architecture: 'Perched on a hilltop with panoramic views, the monastery features traditional Tibetan architecture with prayer flags fluttering in the mountain breeze.',
             festivals: 'Bhumchu Festival (holy water ceremony), Losar, and various religious ceremonies. The Bhumchu Festival is particularly famous.',
             significance: 'Considered the most sacred monastery in Sikkim, it is believed that a mere sight of this monastery cleanses one of all sins.'
           },
-          '6': {
-            id: '6',
+          '5': {
+            id: '5',
             monastery_name: 'Phodong Monastery',
             district: 'North Sikkim',
             address: 'Phodong, North Sikkim',
@@ -171,14 +171,14 @@ export default function MonasteryDetailPage() {
             monastery_type: 'Kagyu',
             visiting_hours: '6:00 AM - 5:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=600&fit=crop',
+            image_url: 'https://i.postimg.cc/kGxWgF0H/Gemini-Generated-Image-qoqvp0qoqvp0qoqv-1.png?w=800&h=600&fit=crop',
             history: 'Originally built in 1740 by Chogyal Gyurmed Namgyal, it was reconstructed in 1977 after being damaged. It belongs to the Kagyu sect of Tibetan Buddhism.',
             architecture: 'The monastery showcases beautiful Tibetan architecture with colorful murals, prayer wheels, and traditional Buddhist symbols.',
             festivals: 'Annual Cham Dance, Losar celebrations, and various Buddhist festivals are celebrated with great enthusiasm.',
             significance: 'Known for its annual Cham dance and beautiful location amidst rhododendron forests.'
           },
-          '7': {
-            id: '7',
+          '6': {
+            id: '6',
             monastery_name: 'Labrang Monastery',
             district: 'North Sikkim',
             address: 'Lachen, North Sikkim',
@@ -189,14 +189,14 @@ export default function MonasteryDetailPage() {
             monastery_type: 'Nyingma',
             visiting_hours: '7:00 AM - 4:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+            image_url: 'https://i.postimg.cc/HkPzK3d0/Gemini-Generated-Image-vg8577vg8577vg85.png?w=800&h=600&fit=crop',
             history: 'Built in 1806, Labrang Monastery serves the Buddhist community in the remote northern region of Sikkim. It provides spiritual guidance to the local population.',
             architecture: 'Simple yet elegant Tibetan architecture adapted to the harsh mountain climate, featuring thick walls and sloped roofs.',
             festivals: 'Losar (Tibetan New Year), local harvest festivals, and Buddhist prayer ceremonies.',
             significance: 'Serves as an important spiritual center for the remote communities of North Sikkim.'
           },
-          '8': {
-            id: '8',
+          '7': {
+            id: '7',
             monastery_name: 'Ralang Monastery',
             district: 'South Sikkim',
             address: 'Ralang, South Sikkim',
@@ -207,7 +207,7 @@ export default function MonasteryDetailPage() {
             monastery_type: 'Kagyu',
             visiting_hours: '6:00 AM - 6:00 PM',
             entry_fee: 5,
-            image_url: 'https://images.unsplash.com/photo-1591123720511-7637d5d3ffe4?w=800&h=600&fit=crop',
+            image_url: 'https://i.postimg.cc/9X6h3tFh/Gemini-Generated-Image-gb4tqegb4tqegb4t.png?w=800&h=600&fit=crop',
             history: 'Founded in 1768 by the fourth Chogyal Tenzin Namgyal, Ralang Monastery belongs to the Kagyu sect and is famous for its Kagyed dance.',
             architecture: 'Traditional Tibetan monastic architecture with beautiful wall paintings, statues, and a peaceful courtyard for meditation.',
             festivals: 'Famous for the Kagyed dance performed during the 28th and 29th days of the 10th Tibetan month, along with other Buddhist festivals.',
