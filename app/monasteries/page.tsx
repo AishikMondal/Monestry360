@@ -278,18 +278,24 @@ export default function MonasteriesPage() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <Link 
                       href={`/monastery/${monastery.id}`}
-                      className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg dark:shadow-green-500/20 hover:scale-105"
+                      className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white text-center py-2 px-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-lg dark:shadow-green-500/20 hover:scale-105"
                     >
                       Learn More
                     </Link>
                     <Link 
                       href={`/maps?monastery=${monastery.id}`}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg dark:shadow-blue-500/20 hover:scale-105"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-center py-2 px-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-lg dark:shadow-blue-500/20 hover:scale-105"
                     >
-                      View on Map
+                      View Map
+                    </Link>
+                    <Link 
+                      href={`/trip-planner?monastery=${monastery.id}`}
+                      className="flex-1 bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white text-center py-2 px-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-lg dark:shadow-purple-500/20 hover:scale-105"
+                    >
+                      Add Trip
                     </Link>
                   </div>
                 </CardContent>
@@ -298,13 +304,21 @@ export default function MonasteriesPage() {
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-12">
-            <Link 
-              href="/maps"
-              className="inline-block bg-gradient-to-r from-green-600 to-blue-600 dark:from-green-500 dark:to-blue-500 text-white px-8 py-3 rounded-lg hover:from-green-700 hover:to-blue-700 dark:hover:from-green-400 dark:hover:to-blue-400 transition-all duration-200 shadow-lg dark:shadow-green-500/20 hover:scale-105"
-            >
-              🗺️ View All on Interactive Map
-            </Link>
+          <div className="text-center mt-12 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link 
+                href="/maps"
+                className="inline-block bg-gradient-to-r from-green-600 to-blue-600 dark:from-green-500 dark:to-blue-500 text-white px-8 py-3 rounded-lg hover:from-green-700 hover:to-blue-700 dark:hover:from-green-400 dark:hover:to-blue-400 transition-all duration-200 shadow-lg dark:shadow-green-500/20 hover:scale-105"
+              >
+                🗺️ View All on Interactive Map
+              </Link>
+              <Link 
+                href="/trip-planner"
+                className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-400 dark:hover:to-pink-400 transition-all duration-200 shadow-lg dark:shadow-purple-500/20 hover:scale-105"
+              >
+                📅 Plan Your Trip
+              </Link>
+            </div>
           </div>
         </div>
       </div>

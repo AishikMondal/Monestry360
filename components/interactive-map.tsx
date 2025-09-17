@@ -165,7 +165,10 @@ export default function InteractiveMap({ monasteries, selectedMonastery, onMonas
       // Reset all markers
       const icon = marker.getIcon() as L.DivIcon
       if (icon.options.html) {
-        const newHtml = icon.options.html.replace(/border: 3px solid [^;]+;/, 'border: 3px solid white;')
+        let newHtml = icon.options.html
+        if (typeof newHtml === 'string') {
+          newHtml = newHtml.replace(/border: 3px solid [^;]+;/, 'border: 3px solid white;')
+        }
         marker.setIcon(L.divIcon({
           ...icon.options,
           html: newHtml
@@ -182,11 +185,14 @@ export default function InteractiveMap({ monasteries, selectedMonastery, onMonas
     if (selectedMarker) {
       const icon = selectedMarker.getIcon() as L.DivIcon
       if (icon.options.html) {
-        const newHtml = icon.options.html.replace(/border: 3px solid [^;]+;/, 'border: 3px solid #fbbf24;')
-        selectedMarker.setIcon(L.divIcon({
-          ...icon.options,
-          html: newHtml
-        }))
+        const htmlContent = icon.options.html
+        if (typeof htmlContent === 'string') {
+          const newHtml = htmlContent.replace(/border: 3px solid [^;]+;/, 'border: 3px solid #fbbf24;')
+          selectedMarker.setIcon(L.divIcon({
+            ...icon.options,
+            html: newHtml
+          }))
+        }
       }
       
       // Center map on selected monastery

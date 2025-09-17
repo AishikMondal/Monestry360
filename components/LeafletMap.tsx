@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react'
+import 'leaflet/dist/leaflet.css'
 
 interface LeafletMapProps {
   monasteries: any[]
@@ -20,8 +21,8 @@ export default function LeafletMap({ monasteries, selectedMonastery, onMonastery
     const initializeMap = async () => {
       try {
         // Dynamically import Leaflet
-        L = (await import('leaflet')).default
-        await import('leaflet/dist/leaflet.css')
+        // CSS is imported at the top of the file for compatibility
+        // No need to import 'leaflet/dist/leaflet.css' here
 
         // Fix for default markers
         delete (L.Icon.Default.prototype as any)._getIconUrl

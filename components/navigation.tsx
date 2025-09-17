@@ -15,6 +15,7 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  Route,
 } from "lucide-react"
 
 interface UserProfile {
