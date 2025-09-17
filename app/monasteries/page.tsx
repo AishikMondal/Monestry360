@@ -78,7 +78,7 @@ export default function MonasteriesPage() {
             visiting_hours: '5:00 AM - 7:00 PM',
             entry_fee: 0,
             contact_phone: '+91-3592-202596',
-            image_url: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=500&h=300&fit=crop'
+            image_url: 'https://i.postimg.cc/j2VzTkFN/Gemini-Generated-Image-1cozau1cozau1coz.png?w=500&h=300&fit=crop'
           },
           {
             id: '3',
@@ -107,7 +107,7 @@ export default function MonasteriesPage() {
             monastery_type: 'Nyingma',
             visiting_hours: '6:00 AM - 6:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=300&fit=crop'
+            image_url: 'https://i.postimg.cc/v89rhb4v/Gemini-Generated-Image-qoqvp0qoqvp0qoqv.png?w=500&h=300&fit=crop'
           },
           {
             id: '5',
@@ -121,7 +121,7 @@ export default function MonasteriesPage() {
             monastery_type: 'Kagyu',
             visiting_hours: '6:00 AM - 5:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=500&h=300&fit=crop'
+            image_url: 'https://i.postimg.cc/kGxWgF0H/Gemini-Generated-Image-qoqvp0qoqvp0qoqv-1.png?w=500&h=300&fit=crop'
           },
           {
             id: '6',
@@ -135,7 +135,7 @@ export default function MonasteriesPage() {
             monastery_type: 'Nyingma',
             visiting_hours: '7:00 AM - 4:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=300&fit=crop'
+            image_url: 'https://i.postimg.cc/HkPzK3d0/Gemini-Generated-Image-vg8577vg8577vg85.png?w=500&h=300&fit=crop'
           },
           {
             id: '7',
@@ -149,7 +149,7 @@ export default function MonasteriesPage() {
             monastery_type: 'Kagyu',
             visiting_hours: '6:00 AM - 6:00 PM',
             entry_fee: 5,
-            image_url: 'https://images.unsplash.com/photo-1591123720511-7637d5d3ffe4?w=500&h=300&fit=crop'
+            image_url: 'https://i.postimg.cc/9X6h3tFh/Gemini-Generated-Image-gb4tqegb4tqegb4t.png?w=500&h=300&fit=crop'
           },
           {
             id: '8',
@@ -163,7 +163,7 @@ export default function MonasteriesPage() {
             monastery_type: 'Nyingma',
             visiting_hours: '5:00 AM - 8:00 PM',
             entry_fee: 0,
-            image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=300&fit=crop'
+            image_url: 'https://i.postimg.cc/qRF13LZM/Gemini-Generated-Image-gb4tqegb4tqegb4t-1.png?w=500&h=300&fit=crop'
           }
         ])
       }
