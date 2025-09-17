@@ -3,9 +3,25 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Navigation } from '@/components/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import {
+  MapPin,
+  Clock,
+  Phone,
+  Globe,
+  Calendar,
+  Star,
+  Route,
+  Camera,
+  Heart,
+  ArrowLeft,
+  Mountain,
+  Users,
+  DollarSign
+} from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 // Dynamically import VirtualTourModal to avoid SSR issues
@@ -40,6 +56,7 @@ export default function MonasteryDetailPage() {
   const [monastery, setMonastery] = useState<Monastery | null>(null)
   const [loading, setLoading] = useState(true)
   const [showVirtualTour, setShowVirtualTour] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const monasteryId = params.id as string
 
   useEffect(() => {
@@ -254,233 +271,263 @@ export default function MonasteryDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading monastery details...</p>
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 transition-colors duration-300 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading monastery details...</p>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (!monastery) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Monastery Not Found</h1>
-          <Link 
-            href="/monasteries" 
-            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Back to Monasteries
-          </Link>
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 transition-colors duration-300 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Monastery Not Found</h2>
+            <Button onClick={() => router.push("/monasteries")} className="bg-green-600 hover:bg-green-700">
+              Back to Monasteries
+            </Button>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-      {/* Header */}
-      <div className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => router.back()}
-              className="text-green-600 hover:text-green-800 font-medium"
-            >
-              ← Back
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-400">/</span>
-              <Link href="/monasteries" className="text-green-600 hover:text-green-800">
-                Monasteries
-              </Link>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-700">{monastery.monastery_name}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 transition-colors duration-300">
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          {/* Back Button */}
+          <Button 
+            onClick={() => router.back()}
+            variant="outline" 
+            className="mb-6 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Hero Image and Title */}
-            <Card className="overflow-hidden shadow-xl">
-              <div className="relative h-96">
-                <img
-                  src={monastery.image_url}
-                  alt={monastery.monastery_name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                <div className="absolute bottom-6 left-6 text-white">
-                  <h1 className="text-4xl font-bold mb-2">{monastery.monastery_name}</h1>
-                  <div className="flex items-center gap-4">
-                    <Badge className="bg-white/20 text-white">
-                      {monastery.district}
-                    </Badge>
-                    <span className="text-white/90">📍 {monastery.address}</span>
+          {/* Hero Section */}
+          <Card className="mb-8 overflow-hidden shadow-xl dark:shadow-2xl dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
+            <div className="relative h-80 bg-gray-200">
+              <img
+                src={monastery.image_url}
+                alt={monastery.monastery_name}
+                className="w-full h-full object-cover"
+                onError={() => setImageError(true)}
+              />
+              {imageError && (
+                <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                  <div className="text-center">
+                    <Mountain className="h-16 w-16 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-600 dark:text-gray-400">{monastery.monastery_name}</p>
                   </div>
                 </div>
-              </div>
-            </Card>
-
-            {/* Description */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-2xl text-green-800">About This Monastery</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  {monastery.description}
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              <div className="absolute bottom-6 left-6 text-white">
+                <Badge className="mb-2 bg-green-600 text-white">
+                  {monastery.district}
+                </Badge>
+                <h1 className="text-4xl font-bold mb-2">{monastery.monastery_name}</h1>
+                <p className="text-green-100 flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  {monastery.address}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          </Card>
 
-            {/* History */}
-            {monastery.history && (
-              <Card className="shadow-lg">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Description */}
+              <Card className="shadow-lg dark:shadow-lg dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="text-xl text-green-800">🏛️ History</CardTitle>
+                  <CardTitle className="text-gray-800 dark:text-gray-200">About This Monastery</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700 leading-relaxed">
-                    {monastery.history}
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {monastery.description}
                   </p>
                 </CardContent>
               </Card>
-            )}
 
-            {/* Architecture */}
-            {monastery.architecture && (
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl text-green-800">🏗️ Architecture</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 leading-relaxed">
-                    {monastery.architecture}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+              {/* History */}
+              {monastery.history && (
+                <Card className="shadow-lg dark:shadow-lg dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-green-800">🏛️ History</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 leading-relaxed">
+                      {monastery.history}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
 
-            {/* Festivals */}
-            {monastery.festivals && (
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl text-green-800">🎭 Festivals & Events</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 leading-relaxed">
-                    {monastery.festivals}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+              {/* Architecture */}
+              {monastery.architecture && (
+                <Card className="shadow-lg dark:shadow-lg dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-green-800">🏗️ Architecture</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 leading-relaxed">
+                      {monastery.architecture}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
 
-            {/* Significance */}
-            {monastery.significance && (
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl text-green-800">⭐ Religious Significance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 leading-relaxed">
-                    {monastery.significance}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+              {/* Festivals */}
+              {monastery.festivals && (
+                <Card className="shadow-lg dark:shadow-lg dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-green-800">🎭 Festivals & Events</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 leading-relaxed">
+                      {monastery.festivals}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Info */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-green-800">Quick Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <span className="font-semibold text-gray-700">Founded:</span>
-                  <p className="text-gray-600">{monastery.founded_year}</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700">Type:</span>
-                  <p className="text-gray-600">{monastery.monastery_type}</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700">Visiting Hours:</span>
-                  <p className="text-gray-600">{monastery.visiting_hours}</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700">Entry Fee:</span>
-                  <p className="text-gray-600">
-                    {monastery.entry_fee === 0 ? 'Free Entry' : `₹${monastery.entry_fee}`}
-                  </p>
-                </div>
-                {monastery.contact_phone && (
-                  <div>
-                    <span className="font-semibold text-gray-700">Contact:</span>
-                    <p className="text-gray-600">{monastery.contact_phone}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <button
-                onClick={() => setShowVirtualTour(true)}
-                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
-              >
-                🎥 Start Virtual Tour
-              </button>
-              
-              <Link 
-                href={`/maps?monastery=${monastery.id}`}
-                className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-3 px-4 rounded-lg font-semibold transition-colors"
-              >
-                🗺️ View on Map
-              </Link>
-
-              <Link 
-                href="/monasteries"
-                className="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center py-3 px-4 rounded-lg font-semibold transition-colors"
-              >
-                🏛️ View All Monasteries
-              </Link>
+              {/* Significance */}
+              {monastery.significance && (
+                <Card className="shadow-lg dark:shadow-lg dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-green-800">⭐ Religious Significance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 leading-relaxed">
+                      {monastery.significance}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
-            {/* Location Card */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-green-800">📍 Location</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">{monastery.address}</p>
-                <div className="text-sm text-gray-500">
-                  <p>Latitude: {monastery.latitude}</p>
-                  <p>Longitude: {monastery.longitude}</p>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Info */}
+              <Card className="shadow-lg dark:shadow-lg dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-800 dark:text-gray-200">Quick Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Founded</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-200">{monastery.founded_year}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Type</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-200">{monastery.monastery_type}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Visiting Hours</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-200">{monastery.visiting_hours}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Entry Fee</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-200">
+                        {monastery.entry_fee === 0 ? 'Free' : `₹${monastery.entry_fee}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {monastery.contact_phone && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Contact</p>
+                        <p className="font-medium text-gray-800 dark:text-gray-200">{monastery.contact_phone}</p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={() => setShowVirtualTour(true)}
+                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
+                >
+                  🎥 Start Virtual Tour
+                </button>
+                
+                <Link 
+                  href={`/maps?monastery=${monastery.id}`}
+                  className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-3 px-4 rounded-lg font-semibold transition-colors"
+                >
+                  🗺️ View on Map
+                </Link>
+
+                <Link 
+                  href="/monasteries"
+                  className="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center py-3 px-4 rounded-lg font-semibold transition-colors"
+                >
+                  🏛️ View All Monasteries
+                </Link>
+              </div>
+
+              {/* Map Preview */}
+              <Card className="shadow-lg dark:shadow-lg dark:shadow-green-500/10 border-0 dark:border dark:border-gray-700/50 bg-white/95 dark:bg-gray-800/90 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-800 dark:text-gray-200">Location</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-gradient-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 rounded-lg p-6 text-center">
+                    <MapPin className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-3" />
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      Coordinates: {monastery.latitude.toFixed(4)}, {monastery.longitude.toFixed(4)}
+                    </p>
+                    <Button 
+                      onClick={() => router.push(`/maps?monastery=${monastery.id}`)}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      View on Interactive Map
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-
-        {/* Virtual Tour Modal */}
-        {showVirtualTour && (
-          <VirtualTourModal
-            monastery={monastery}
-            isOpen={showVirtualTour}
-            onClose={() => setShowVirtualTour(false)}
-          />
-        )}
       </div>
-    </div>
+
+      {/* Virtual Tour Modal */}
+      {showVirtualTour && (
+        <VirtualTourModal
+          monastery={monastery}
+          isOpen={showVirtualTour}
+          onClose={() => setShowVirtualTour(false)}
+        />
+      )}
+    </>
   )
 }

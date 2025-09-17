@@ -1,242 +1,215 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from 'react'
-
-interface Monastery {
-  id: string
-  name: string
-  latitude: number
-  longitude: number
-  district: string
-  address: string
-}
+import { useEffect, useRef, useState } from 'react'
 
 interface LeafletMapProps {
-  monasteries: Monastery[]
-  center?: [number, number]
-  zoom?: number
-  height?: string
-  onMarkerClick?: (monastery: Monastery) => void
+  monasteries: any[]
+  selectedMonastery?: any
+  onMonasterySelect: (monastery: any) => void
 }
 
-const LeafletMap: React.FC<LeafletMapProps> = ({
-  monasteries,
-  center = [27.3389, 88.6065], // Default to Gangtok, Sikkim
-  zoom = 10,
-  height = "400px",
-  onMarkerClick
-}) => {
+export default function LeafletMap({ monasteries, selectedMonastery, onMonasterySelect }: LeafletMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
-  const [mapInstance, setMapInstance] = useState<any>(null)
-  const [leafletLoaded, setLeafletLoaded] = useState(false)
-  const [L, setL] = useState<any>(null)
-  const [isInitializing, setIsInitializing] = useState(false)
+  const mapInstanceRef = useRef<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Load Leaflet dynamically
   useEffect(() => {
-    const loadLeaflet = async () => {
-      try {
-        console.log('Loading Leaflet library...')
-        const leaflet = await import('leaflet')
-        setL(leaflet.default)
-        setLeafletLoaded(true)
-        console.log('Leaflet loaded successfully')
-      } catch (error) {
-        console.error('Failed to load Leaflet:', error)
-      }
-    }
-
-    loadLeaflet()
-  }, [])
-
-  // Initialize map when Leaflet is loaded
-  useEffect(() => {
-    if (!leafletLoaded || !L || !mapRef.current || isInitializing || mapInstance) return
-
-    setIsInitializing(true)
-    console.log('Initializing map...')
-
-    // Fix for default markers in Next.js
-    delete (L.Icon.Default.prototype as any)._getIconUrl
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    })
+    let L: any = null
+    let map: any = null
 
     const initializeMap = async () => {
       try {
-        // Clear any existing content first
-        if (mapRef.current) {
-          mapRef.current.innerHTML = ''
-        }
-        
-        // Wait for DOM to settle and ensure container has dimensions
-        await new Promise(resolve => setTimeout(resolve, 300))
+        // Dynamically import Leaflet
+        L = (await import('leaflet')).default
+        await import('leaflet/dist/leaflet.css')
 
-        if (!mapRef.current) return
-
-        // Ensure the container has proper dimensions
-        const rect = mapRef.current.getBoundingClientRect()
-        if (rect.width === 0 || rect.height === 0) {
-          console.log('Container not ready, waiting...')
-          await new Promise(resolve => setTimeout(resolve, 500))
-        }
-
-        // Force container to have explicit dimensions
-        mapRef.current.style.width = '100%'
-        mapRef.current.style.height = height
-        mapRef.current.style.position = 'relative'
-
-        console.log('Container dimensions:', mapRef.current.offsetWidth, 'x', mapRef.current.offsetHeight)
-
-        // Initialize map with proper options (hide attribution)
-        const map = L.map(mapRef.current, {
-          center,
-          zoom,
-          zoomControl: true,
-          attributionControl: false, // Hide the attribution
-          preferCanvas: false
+        // Fix for default markers
+        delete (L.Icon.Default.prototype as any)._getIconUrl
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
         })
 
-        // Add OpenStreetMap tiles without attribution
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 18
-        }).addTo(map)
+        if (mapRef.current && !mapInstanceRef.current) {
+          // Initialize map
+          map = L.map(mapRef.current).setView([27.3389, 88.6065], 10)
+          mapInstanceRef.current = map
 
-        // Force map to invalidate size after creation
-        setTimeout(() => {
-          map.invalidateSize()
-        }, 100)
+          // Add OpenStreetMap tiles
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+          }).addTo(map)
 
-        setMapInstance(map)
-        console.log('Map initialized successfully')
+          // Add monasteries as markers
+          monasteries.forEach((monastery) => {
+            if (monastery.coordinates?.lat && monastery.coordinates?.lng) {
+              // Create custom icon based on difficulty
+              const iconColor = monastery.difficulty === 'easy' ? '#22c55e' : 
+                               monastery.difficulty === 'moderate' ? '#f59e0b' : 
+                               monastery.difficulty === 'challenging' ? '#ef4444' : '#3b82f6'
+
+              const customIcon = L.divIcon({
+                html: `
+                  <div style="
+                    background-color: ${iconColor};
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 14px;
+                    font-weight: bold;
+                    cursor: pointer;
+                  ">🏛️</div>
+                `,
+                className: 'custom-monastery-marker',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+              })
+
+              const marker = L.marker([monastery.coordinates.lat, monastery.coordinates.lng], {
+                icon: customIcon
+              }).addTo(map)
+
+              // Add popup
+              const popupContent = `
+                <div style="min-width: 200px; max-width: 250px;">
+                  <img src="${monastery.image}" alt="${monastery.name}" 
+                       style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" 
+                       onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk1vbmFzdGVyeSBJbWFnZTwvdGV4dD48L3N2Zz4='" />
+                  <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #1f2937;">${monastery.name}</h3>
+                  <p style="margin: 0 0 8px 0; font-size: 12px; color: #6b7280;">${monastery.location}</p>
+                  <p style="margin: 0 0 8px 0; font-size: 12px; color: #374151;">${monastery.description.substring(0, 100)}...</p>
+                  <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+                    <span style="color: #fbbf24;">⭐</span>
+                    <span style="font-size: 12px; font-weight: 600; color: #374151;">${monastery.rating}</span>
+                    <span style="font-size: 12px; color: #6b7280;">(${monastery.reviewCount} reviews)</span>
+                  </div>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px;">
+                    <span style="background: ${iconColor}; color: white; padding: 2px 6px; border-radius: 12px; font-size: 10px;">${monastery.difficulty}</span>
+                    <span style="background: #e5e7eb; color: #374151; padding: 2px 6px; border-radius: 12px; font-size: 10px;">${monastery.altitude}</span>
+                  </div>
+                  <button 
+                    onclick="window.selectMonasteryFromMap('${monastery.id}')"
+                    style="
+                      width: 100%;
+                      background: linear-gradient(to right, #10b981, #3b82f6);
+                      color: white;
+                      padding: 8px 16px;
+                      border: none;
+                      border-radius: 6px;
+                      font-size: 12px;
+                      font-weight: 600;
+                      cursor: pointer;
+                      transition: all 0.2s;
+                    "
+                    onmouseover="this.style.transform='scale(1.02)'"
+                    onmouseout="this.style.transform='scale(1)'"
+                  >
+                    View Details
+                  </button>
+                </div>
+              `
+              
+              marker.bindPopup(popupContent, {
+                maxWidth: 250,
+                className: 'custom-popup'
+              })
+
+              // Add click event
+              marker.on('click', () => {
+                onMonasterySelect(monastery)
+              })
+            }
+          })
+
+          // Fit map to show all markers
+          if (monasteries.length > 0) {
+            const group = new L.featureGroup(
+              monasteries
+                .filter(m => m.coordinates?.lat && m.coordinates?.lng)
+                .map(m => L.marker([m.coordinates.lat, m.coordinates.lng]))
+            )
+            map.fitBounds(group.getBounds().pad(0.1))
+          }
+
+          setIsLoading(false)
+        }
       } catch (error) {
-        console.error('Map initialization error:', error)
-      } finally {
-        setIsInitializing(false)
+        console.error('Error loading map:', error)
+        setIsLoading(false)
       }
     }
 
     initializeMap()
 
+    // Cleanup
     return () => {
-      setIsInitializing(false)
-      if (mapInstance) {
-        try {
-          mapInstance.remove()
-        } catch (e) {
-          console.log('Map cleanup:', e)
-        }
-        setMapInstance(null)
-      }
-      if (mapRef.current) {
-        mapRef.current.innerHTML = ''
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove()
+        mapInstanceRef.current = null
       }
     }
-  }, [leafletLoaded, L, center, zoom])
+  }, [monasteries, onMonasterySelect])
 
-  // Add markers when monasteries change
+  // Global function for popup buttons
   useEffect(() => {
-    if (!mapInstance || !L) return
-
-    console.log('Trying to add markers for', monasteries.length, 'monasteries')
-    console.log('Sample monastery:', monasteries[0])
-
-    // Clear existing markers (if any)
-    mapInstance.eachLayer((layer: any) => {
-      if (layer instanceof L.Marker) {
-        mapInstance.removeLayer(layer)
-      }
-    })
-
-    if (monasteries.length === 0) {
-      console.log('No monasteries to display')
-      return
-    }
-
-    // Use simple default markers first to test
-    const newMarkers: any[] = []
-    
-    monasteries.forEach((monastery, index) => {
-      console.log(`Adding marker ${index + 1}:`, monastery.name, `at [${monastery.latitude}, ${monastery.longitude}]`)
-      
-      try {
-        const marker = L.marker([monastery.latitude, monastery.longitude]).addTo(mapInstance)
-
-        // Add popup
-        marker.bindPopup(`
-          <div style="padding: 8px; max-width: 200px;">
-            <h3 style="font-weight: bold; color: #dc2626; margin-bottom: 8px;">${monastery.name}</h3>
-            <p style="font-size: 12px; margin: 4px 0;"><strong>District:</strong> ${monastery.district}</p>
-            <p style="font-size: 12px; margin: 4px 0;"><strong>Address:</strong> ${monastery.address}</p>
-          </div>
-        `)
-
-        // Add click handler
-        marker.on('click', () => {
-          console.log('Marker clicked:', monastery.name)
-          if (onMarkerClick) {
-            onMarkerClick(monastery)
-          }
-        })
-
-        newMarkers.push(marker)
-        console.log(`✅ Successfully added marker for ${monastery.name}`)
-      } catch (error) {
-        console.error(`❌ Failed to add marker for ${monastery.name}:`, error)
-      }
-    })
-
-    console.log(`Total markers added: ${newMarkers.length}`)
-
-    // Fit map to show all markers
-    if (newMarkers.length > 0) {
-      try {
-        const group = L.featureGroup(newMarkers)
-        mapInstance.fitBounds(group.getBounds(), { padding: [20, 20] })
-        console.log('✅ Map bounds adjusted to show all markers')
-      } catch (error) {
-        console.error('❌ Failed to fit bounds:', error)
+    (window as any).selectMonasteryFromMap = (monasteryId: string) => {
+      const monastery = monasteries.find(m => m.id.toString() === monasteryId)
+      if (monastery) {
+        onMonasterySelect(monastery)
       }
     }
-  }, [mapInstance, L, monasteries, onMarkerClick])
 
-  if (!leafletLoaded) {
+    return () => {
+      delete (window as any).selectMonasteryFromMap
+    }
+  }, [monasteries, onMonasterySelect])
+
+  if (isLoading) {
     return (
-      <div 
-        style={{ height, width: '100%' }}
-        className="rounded-lg shadow-md border border-gray-200 bg-gray-50 flex items-center justify-center"
-      >
-        <div className="text-center text-gray-600">
+      <div className="h-96 bg-gradient-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 rounded-lg flex items-center justify-center">
+        <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-          <p className="text-sm mt-2">Loading map...</p>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Loading Interactive Map...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <>
-      <link 
-        rel="stylesheet" 
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossOrigin=""
-      />
-      <div 
-        ref={mapRef} 
-        style={{ 
-          height, 
-          width: '100%',
-          minHeight: '400px',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-        className="rounded-lg shadow-md border border-gray-200 z-0"
-      />
-    </>
+    <div className="relative h-96">
+      <div ref={mapRef} className="w-full h-full rounded-lg" />
+      
+      {/* Map Legend */}
+      <div className="absolute top-4 right-4 bg-white/95 dark:bg-gray-800/95 p-3 rounded-lg shadow-lg border dark:border-gray-600 text-sm backdrop-blur-sm">
+        <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">Difficulty Level</h4>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-gray-600 dark:text-gray-400">Easy</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <span className="text-gray-600 dark:text-gray-400">Moderate</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="text-gray-600 dark:text-gray-400">Challenging</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Map Attribution */}
+      <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-gray-800/95 px-2 py-1 rounded text-xs text-gray-600 dark:text-gray-400 backdrop-blur-sm">
+        🗺️ Interactive Map • Click markers for details
+      </div>
+    </div>
   )
 }
-
-export default LeafletMap

@@ -251,3 +251,133 @@ html {
   width: 300px;
   height: 300px;
 }
+
+/* Custom dark mode styles */
+.dark {
+  color-scheme: dark;
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Enhanced Dark Mode Styles */
+.dark {
+  /* Smooth gradients for dark mode */
+  background: linear-gradient(135deg, 
+    hsl(220, 26%, 8%) 0%, 
+    hsl(220, 26%, 12%) 50%, 
+    hsl(224, 71%, 6%) 100%);
+}
+
+/* Card enhancements for dark mode */
+.dark .bg-white {
+  @apply bg-gray-900/80 backdrop-blur-sm;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-gray-800/60;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-gray-700/60;
+}
+
+/* Border enhancements */
+.dark .border-gray-200 {
+  @apply border-gray-700/60;
+}
+
+.dark .border-gray-300 {
+  @apply border-gray-600/60;
+}
+
+/* Text color improvements */
+.dark .text-gray-600 {
+  @apply text-gray-300;
+}
+
+.dark .text-gray-700 {
+  @apply text-gray-200;
+}
+
+.dark .text-gray-500 {
+  @apply text-gray-400;
+}
+
+/* Button enhancements */
+.dark button:hover {
+  @apply shadow-lg shadow-green-500/20;
+}
+
+/* Gradient backgrounds for cards */
+.dark .gradient-card {
+  background: linear-gradient(135deg, 
+    hsl(220, 26%, 12%) 0%, 
+    hsl(220, 26%, 15%) 100%);
+  border: 1px solid hsl(142, 70%, 45%, 0.2);
+}
+
+/* Glassmorphism effects */
+.dark .glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Sexy gradients for dark mode */
+.dark-gradient-1 {
+  background: linear-gradient(135deg, 
+    hsl(142, 70%, 25%) 0%, 
+    hsl(220, 26%, 12%) 50%, 
+    hsl(224, 71%, 8%) 100%);
+}
+
+.dark-gradient-2 {
+  background: linear-gradient(135deg, 
+    hsl(220, 26%, 10%) 0%, 
+    hsl(142, 70%, 15%) 30%, 
+    hsl(220, 26%, 8%) 100%);
+}
+
+/* Glow effects */
+.dark .glow-green {
+  box-shadow: 0 0 20px hsl(142, 70%, 45%, 0.3);
+}
+
+.dark .glow-blue {
+  box-shadow: 0 0 20px hsl(220, 70%, 45%, 0.3);
+}
+
+/* Enhanced Dark Mode Styling */
+.dark {
+  background: linear-gradient(135deg, 
+    rgb(17, 24, 39) 0%,     
+    rgb(30, 41, 59) 30%,      
+    rgb(17, 24, 39) 70%,    
+    rgb(15, 23, 42) 100%    
+  ) !important;
+}
+
+.dark .enhanced-card {
+  background: linear-gradient(135deg, 
+    rgba(31, 41, 55, 0.9) 0%,   
+    rgba(55, 65, 81, 0.8) 100%  
+  );
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.dark .sexy-shadow {
+  box-shadow: 
+    0 25px 50px -12px rgba(16, 185, 129, 0.15),
+    0 0 0 1px rgba(16, 185, 129, 0.05);
+}
+
+.dark .hover-glow:hover {
+  box-shadow: 
+    0 0 20px rgba(16, 185, 129, 0.3),
+    0 0 40px rgba(16, 185, 129, 0.1);
+  transform: translateY(-2px);
+}

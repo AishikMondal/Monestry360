@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -182,130 +181,133 @@ export default function MonasteriesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading monasteries...</p>
+      <>
+        <Navigation />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:via-slate-800 dark:to-gray-900">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading monasteries...</p>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-6">
+    <>
       <Navigation />
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-green-800 mb-4">
-            Explore Sikkim's Sacred Monasteries
-          </h1>
-          <p className="text-lg text-green-600 mb-6">
-            Discover the spiritual heritage and rich Buddhist culture of Sikkim
-          </p>
-          
-          {/* District Filter */}
-          <div className="flex justify-center gap-2 flex-wrap">
-            {districts.map(district => (
-              <button
-                key={district}
-                onClick={() => setSelectedDistrict(district)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  selectedDistrict === district
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-green-600 hover:bg-green-100'
-                }`}
-              >
-                {district} {district !== 'All' && `(${monasteries.filter(m => m.district === district).length})`}
-              </button>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 py-8 px-6 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-green-800 dark:text-green-400 mb-4">
+              Explore Sikkim's Sacred Monasteries
+            </h1>
+            <p className="text-lg text-green-600 dark:text-green-300 mb-6">
+              Discover the spiritual heritage and rich Buddhist culture of Sikkim
+            </p>
+            
+            {/* District Filter */}
+            <div className="flex justify-center gap-2 flex-wrap">
+              {districts.map(district => (
+                <button
+                  key={district}
+                  onClick={() => setSelectedDistrict(district)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedDistrict === district
+                      ? 'bg-green-600 dark:bg-green-500 text-white shadow-lg dark:shadow-green-500/20'
+                      : 'bg-white dark:bg-gray-800 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-gray-700 border dark:border-gray-600'
+                  }`}
+                >
+                  {district} {district !== 'All' && `(${monasteries.filter(m => m.district === district).length})`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Monasteries Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredMonasteries.map((monastery, index) => (
+              <Card key={monastery.id} className="monastery-card card-hover-effect overflow-hidden shadow-xl dark:shadow-2xl dark:shadow-green-500/10 border-0 bg-white dark:bg-gray-800/90 backdrop-blur-sm hover:scale-105 transition-all duration-300">
+                {/* Image */}
+                <div className="relative h-48 bg-gray-200">
+                  <img
+                    src={monastery.image_url || `https://images.unsplash.com/photo-${1544735716392 + index}fe2489ffa?w=600&h=400&fit=crop`}
+                    alt={monastery.monastery_name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const fallbackImages = [
+                        'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&h=400&fit=crop',
+                        'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&h=400&fit=crop',
+                        'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&h=400&fit=crop',
+                        'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=600&h=400&fit=crop',
+                        'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&h=400&fit=crop',
+                        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
+                        'https://images.unsplash.com/photo-1591123720511-7637d5d3ffe4?w=600&h=400&fit=crop',
+                        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop'
+                      ]
+                      e.currentTarget.src = fallbackImages[index % fallbackImages.length]
+                    }}
+                  />
+                  <div className="absolute top-3 right-3">
+                    <Badge variant="secondary" className="bg-white text-green-800 font-semibold">
+                      {monastery.district}
+                    </Badge>
+                  </div>
+                </div>
+
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-2xl text-green-800 dark:text-green-400 font-bold mb-2">
+                    {monastery.monastery_name}
+                  </CardTitle>
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <span>📍</span>
+                    <span>{monastery.address}</span>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    {monastery.description?.slice(0, 100) || 'A sacred Buddhist monastery in Sikkim.'}...
+                  </p>
+
+                  {/* Basic Info */}
+                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <span>Founded: {monastery.founded_year || 'Ancient'}</span>
+                    <span>{monastery.entry_fee === 0 ? 'Free Entry' : `₹${monastery.entry_fee}`}</span>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    <Link 
+                      href={`/monastery/${monastery.id}`}
+                      className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg dark:shadow-green-500/20 hover:scale-105"
+                    >
+                      Learn More
+                    </Link>
+                    <Link 
+                      href={`/maps?monastery=${monastery.id}`}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg dark:shadow-blue-500/20 hover:scale-105"
+                    >
+                      View on Map
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
+
+          {/* Footer */}
+          <div className="text-center mt-12">
+            <Link 
+              href="/maps"
+              className="inline-block bg-gradient-to-r from-green-600 to-blue-600 dark:from-green-500 dark:to-blue-500 text-white px-8 py-3 rounded-lg hover:from-green-700 hover:to-blue-700 dark:hover:from-green-400 dark:hover:to-blue-400 transition-all duration-200 shadow-lg dark:shadow-green-500/20 hover:scale-105"
+            >
+              🗺️ View All on Interactive Map
+            </Link>
+          </div>
         </div>
-
-        {/* Monasteries Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredMonasteries.map((monastery, index) => (
-            <Card key={monastery.id} className="monastery-card card-hover-effect overflow-hidden shadow-xl border-0 bg-white">
-              {/* Image */}
-              <div className="relative h-48 bg-gray-200">
-                <img
-                  src={monastery.image_url || `https://images.unsplash.com/photo-${1544735716392 + index}fe2489ffa?w=600&h=400&fit=crop`}
-                  alt={monastery.monastery_name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const fallbackImages = [
-                      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&h=400&fit=crop',
-                      'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&h=400&fit=crop',
-                      'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&h=400&fit=crop',
-                      'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=600&h=400&fit=crop',
-                      'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&h=400&fit=crop',
-                      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
-                      'https://images.unsplash.com/photo-1591123720511-7637d5d3ffe4?w=600&h=400&fit=crop',
-                      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop'
-                    ]
-                    e.currentTarget.src = fallbackImages[index % fallbackImages.length]
-                  }}
-                />
-                <div className="absolute top-3 right-3">
-                  <Badge variant="secondary" className="bg-white text-green-800 font-semibold">
-                    {monastery.district}
-                  </Badge>
-                </div>
-              </div>
-
-              <CardHeader className="pb-4">
-                <CardTitle className="text-2xl text-green-800 font-bold mb-2">
-                  {monastery.monastery_name}
-                </CardTitle>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span>📍</span>
-                  <span>{monastery.address}</span>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <p className="text-gray-600 text-sm">
-                  {monastery.description?.slice(0, 100) || 'A sacred Buddhist monastery in Sikkim.'}...
-                </p>
-
-                {/* Basic Info */}
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>Founded: {monastery.founded_year || 'Ancient'}</span>
-                  <span>{monastery.entry_fee === 0 ? 'Free Entry' : `₹${monastery.entry_fee}`}</span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <Link 
-                    href={`/monastery/${monastery.id}`}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-colors"
-                  >
-                    Learn More
-                  </Link>
-                  <Link 
-                    href={`/maps?monastery=${monastery.id}`}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg text-sm font-medium transition-colors"
-                  >
-                    View on Map
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-12">
-          <Link 
-            href="/maps"
-            className="inline-block bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors"
-          >
-            🗺️ View All on Interactive Map
-          </Link>
-        </div>
-
-
       </div>
-    </div>
+    </>
   )
 }

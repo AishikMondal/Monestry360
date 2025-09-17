@@ -2,30 +2,20 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ThemeToggle } from "@/components/theme-toggle"
 import {
   Menu,
   X,
   Mountain,
   Map,
-  Calendar,
-  Archive,
   Compass,
   User,
   LogOut,
-  Settings,
   LayoutDashboard,
 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
 
 interface UserProfile {
   id: string
@@ -40,45 +30,43 @@ export function Navigation() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
 
   const navItems = [
     { href: "/", label: "Home", icon: Mountain },
     { href: "/monasteries", label: "Monasteries", icon: Mountain },
     { href: "/maps", label: "Interactive Map", icon: Map },
-    { href: "/events", label: "Events & Festivals", icon: Calendar },
-    { href: "/tours", label: "Virtual Tours", icon: Archive },
     { href: "/plan", label: "Plan Your Visit", icon: Compass },
   ]
+  
+  // Add dashboard for authenticated users
+  const authenticatedNavItems = user ? [...navItems, { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : navItems
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
-
+      
       if (session?.user) {
         // Get user profile
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single()
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single()
+        
         setProfile(profileData)
       }
+      
       setIsLoading(false)
     }
 
-    getInitialSession()
+    getUser()
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
-
-      if (session?.user) {
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single()
-        setProfile(profileData)
-      } else {
+      if (!session?.user) {
         setProfile(null)
       }
     })
@@ -91,11 +79,6 @@ export function Navigation() {
     router.push("/")
   }
 
-  const getDashboardLink = () => {
-    if (!profile) return "/dashboard"
-    return profile.user_type === "monastery" ? "/dashboard/monastery" : "/dashboard/traveller"
-  }
-
   const getUserInitials = () => {
     if (!profile?.full_name) return "U"
     return profile.full_name
@@ -106,24 +89,28 @@ export function Navigation() {
   }
 
   return (
-    <nav className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b border-border">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border sticky top-0 z-50">
+      <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Mountain className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl text-foreground">Monastery360</span>
+            <span className="text-xl font-bold">Monastery360</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => {
+            {authenticatedNavItems.map((item) => {
               const Icon = item.icon
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex items-center space-x-1 text-muted-foreground hover:text-primary transition-colors"
+                  className={`flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary ${
+                    pathname === item.href
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  }`}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
@@ -132,54 +119,49 @@ export function Navigation() {
             })}
           </div>
 
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Authentication */}
             {isLoading ? (
-              <div className="w-8 h-8 bg-muted rounded-full animate-pulse" />
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             ) : user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                        {getUserInitials()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex flex-col space-y-1 p-2">
-                    <p className="text-sm font-medium leading-none">{profile?.full_name || "User"}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                    <p className="text-xs leading-none text-muted-foreground capitalize">
-                      {profile?.user_type || "User"}
-                    </p>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.push('/dashboard')}
+                  className="hidden md:flex"
+                >
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="relative h-10 w-10 rounded-full p-0"
+                  onClick={() => {
+                    console.log('Profile button clicked')
+                    router.push('/profile')
+                  }}
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+                    {getUserInitials()}
                   </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href={getDashboardLink()} className="flex items-center">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings" className="flex items-center">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="hidden md:flex"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" asChild>
@@ -190,91 +172,67 @@ export function Navigation() {
                 </Button>
               </div>
             )}
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-card rounded-lg mt-2">
-              {navItems.map((item) => {
-                const Icon = item.icon
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                )
-              })}
-
-              <div className="border-t border-border pt-2 mt-2">
-                {user ? (
-                  <>
-                    <div className="px-3 py-2">
-                      <p className="text-sm font-medium">{profile?.full_name || "User"}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                    </div>
-                    <Link
-                      href={getDashboardLink()}
-                      className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <LayoutDashboard className="h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <User className="h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleSignOut()
-                        setIsOpen(false)
-                      }}
-                      className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-muted rounded-md transition-colors w-full text-left"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Sign out</span>
-                    </button>
-                  </>
-                ) : (
-                  <div className="space-y-1">
-                    <Link
-                      href="/auth/login"
-                      className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <User className="h-4 w-4" />
-                      <span>Sign In</span>
-                    </Link>
-                    <Link
-                      href="/auth/signup"
-                      className="flex items-center space-x-2 px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <User className="h-4 w-4" />
-                      <span>Sign Up</span>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="md:hidden py-4 space-y-2">
+            {authenticatedNavItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    pathname === item.href
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-primary hover:bg-muted"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Link>
+              )
+            })}
+            
+            {user && (
+              <>
+                <div className="border-t border-border my-2"></div>
+                <button
+                  onClick={() => {
+                    console.log('Mobile profile button clicked')
+                    router.push('/profile')
+                    setIsOpen(false)
+                  }}
+                  className="flex items-center space-x-2 w-full px-4 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-primary hover:bg-muted"
+                >
+                  <User className="h-4 w-4" />
+                  <span>Profile</span>
+                </button>
+                <button
+                  onClick={() => {
+                    handleSignOut()
+                    setIsOpen(false)
+                  }}
+                  className="flex items-center space-x-2 w-full px-4 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-primary hover:bg-muted"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
